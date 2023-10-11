@@ -1,4 +1,4 @@
-from queue import LifoQueue
+import queue
 
 # Creación de la estructura de datos del arbol
 class Nodo:
@@ -30,7 +30,7 @@ class Nodo:
 class Arbol:
 
     # Variables de la clase
-    Nodos_por_incluir = LifoQueue()  # Cola de prioridad para insertar nodos al arbol
+    Nodos_por_incluir = queue.Queue()  # Cola de prioridad para insertar nodos al arbol
     Nodos_recorridos: list = []      # Lista de nodos ya recorridos en el arbol
     Direccion_nodos: list = []       # Lista de direcciones para llegar a la hoja
 
@@ -110,7 +110,7 @@ class Arbol:
 
 
     # Agregamos los nodos a una queue para posteriormente ingresarlos en el arbol
-    def Agregar_nodo_LIFO(self, nodo): self.Nodos_por_incluir.put(nodo)
+    def Agregar_nodo_FIFO(self, nodo): self.Nodos_por_incluir.put(nodo)
 
     # Agregamos la dirección o ruta que debe seguir el arbol para ingresar el nodo
     def Agregar_direccion_nodo(self, direccion): self.Direccion_nodos.append(direccion)

@@ -5,6 +5,24 @@ from Arbol import *
 
 """
 FUNCIONES PRINCIPALES___________________________________________________"""
+
+# función creada para trabajar con la inserción de direcciones en orden
+def Agregar_elemento_Priorityqueue(Dato, Queue_vieja: queue, Posicion: int):
+    Nueva_Queue = queue.Queue()
+
+
+    if Posicion == 0:
+        Nueva_Queue.put(Dato)
+        for i in range(Queue_vieja.qsize()): Nueva_Queue.put(Queue_vieja.get())
+
+    else:
+        for i in range(Posicion):
+            Nueva_Queue.put(Queue_vieja.get())
+        Nueva_Queue.put(Dato)
+        for i in range(Queue_vieja.qsize()): Nueva_Queue.put(Queue_vieja.get())
+
+    return Nueva_Queue
+
 # Función que dibuja al meñeco
 def dibujar_muneco():
     ventana.blit(muneco_img, (pos_x * TAMANO_CUADRO, pos_y * TAMANO_CUADRO))
@@ -129,26 +147,26 @@ ARBOL = Arbol()
 ARBOL.Agregar_nodo_LIFO(Nodo(pos_y, pos_x))
 ARBOL.Agregar(Posicion_inicial)"""
 
+Posiciones_por_agregar = queue.Queue()  # Parametro principal de generar_nodos con direcciones
+
 
 # Generar arbol y dibujar
 while True:
+    Posiciones_por_agregar_aux = []  # Parametro principal de generar_nodos sin importar su eliminación
+    Nodos_por_agregar = []  # Guardar los nodos en una lista para después agregarlos todos al LIFO
+
     areas_descubiertas[pos_y][pos_x] = True
     Direccion = None
 
-    Nodos_por_agregar = []       # Guardar los nodos en una lista para despues agregarlos todos al LIFO
-    Posiciones_por_agregar = []  # Parametro principal de generar_nodos
-
-
-
-
     if ARBOL.Vacio():
         Posicion_inicial = [pos_y, pos_x]
-        ARBOL.Agregar_nodo_LIFO(Nodo(pos_y, pos_x))
+        ARBOL.Agregar_nodo_FIFO(Nodo(pos_y, pos_x))
         ARBOL.Generar_nodos(None)
 
     else:
         # 1. ANALISIS DE LOS LADOS
         Areas_Visitadas = sensor_mirar()  # Adquirimos las areas descubiertas
+        it = 0
 
         # 2. FILTRAR LADOS
         # Agregamos los nodos a los que podemos avanzar en un LIFO queue
@@ -158,32 +176,37 @@ while True:
             if matriz[Areas_Visitadas[i].Posicion_y][Areas_Visitadas[i].Posicion_x] == 1:
                 if ((Areas_Visitadas[i].Posicion_actual in ARBOL.Nodos_recorridos) is False) or (len(Arbol.Nodos_recorridos) == 0):
                     nodo = Nodo(Areas_Visitadas[i].Posicion_Y, Areas_Visitadas[i].Posicion_X, Areas_Visitadas[i].direccion)
-                    ARBOL.Agregar_nodo_LIFO(nodo)
-                    ARBOL.Generar_nodos(Areas_Visitadas[i].direccion)
-                    ARBOL.Agregar_direccion_nodo(nodo.direccion)
+
                     Direccion = nodo.direccion
+                    Nodos_por_agregar.append(nodo)  # ARBOL.Agregar_nodo_LIFO(nodo)
 
-                    time.sleep(1)
+                    if Posiciones_por_agregar.qsize() != 0 and i == 0:
+                        Posiciones_por_agregar = Agregar_elemento_Priorityqueue(Direccion, Posiciones_por_agregar, 0)
+                        it += 1
 
-        """
-        agregar en el arbol los nodos de forma particular en un nodo
-        for numero de nodos agregados en las listas tales
-            nodo.generar_nodos()
-        """
+                    elif Posiciones_por_agregar.qsize() != 0 and i != 0:
+                        Posiciones_por_agregar = Agregar_elemento_Priorityqueue(Direccion, Posiciones_por_agregar, it)
+                        it += 1
+                    elif Posiciones_por_agregar.qsize() == 0:
+                        Posiciones_por_agregar.put(Direccion)
+                        it += 1
 
-    #EXPANDIR NODOS DISPONIBLES
+                    Posiciones_por_agregar_aux.append(Direccion)
 
-    """    # Recorremos la lista de nodos para avanzar y generar las hojas
-        for i in range(ARBOL.Numero_nodos_analizar()):
-            nodo = ARBOL.Nodo_analizar()
-    
-            if (nodo in ARBOL.Lista_nodos_recorridos() == True):
-                continue
-    
-            else:
-                ARBOL.Agregar_nodos()
-    
-    """
+                    time.sleep(0.5)
+
+        # Coleccionamos en una queue los nodos por agregar
+        for i in Nodos_por_agregar:
+            ARBOL.Agregar_nodo_FIFO(i)
+
+        # Dado las direcciones de cada ramificación, generar nodo
+        for i in Posiciones_por_agregar_aux:
+            ARBOL.Generar_nodos(i)
+
+        # Al acabar, ingresar en la lista de direcciones un elemento de las posiciones por agregar
+        Direccion = Posiciones_por_agregar.get()
+        ARBOL.Agregar_direccion_nodo(Direccion)
+
 
 
     if pos_x == 14 and pos_y == 1: ganado = True  # De haber llegado a las coordenadas finales
@@ -227,7 +250,7 @@ while True:
         sys.exit()
 
     # Mostrar coordenadas generales en la ventana
-    coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
+    coordenadas = f'Coordenadas: ({pos_y}, {pos_x})'
     texto = fuente.render(coordenadas, True, BLANCO)
     ventana.blit(texto, (10, 10))
     pygame.display.update()
@@ -250,3 +273,5 @@ while True:
                  (14 * TAMANO_CUADRO, 1 * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
 
     pygame.display.update()
+
+
