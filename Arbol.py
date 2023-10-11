@@ -115,5 +115,24 @@ class Arbol:
     # Agregamos la dirección o ruta que debe seguir el arbol para ingresar el nodo
     def Agregar_direccion_nodo(self, direccion): self.Direccion_nodos.append(direccion)
 
+    # Eliminamos la últma ruta que debe seguir el arbol
+    def Eliminar_direccion_nodo(self): self.Direccion_nodos.pop()
+
+    # Contamos el número de hojas en toda la ramificación del arbol
+    @property
+    def Numero_Nodos(self): return len(self.Direccion_nodos)
+
     # Verifica que el arbol esté vacio
     def Vacio(self): return self.Inicio == None
+
+    # Obtenemos las coordenadas del nodo actual
+    def Coordenadas_nodo(self):
+        aux: Nodo = self.Inicio
+
+        # Llegamos a la hoja siguiendo las respectivas desiciones generadas
+        for i in Arbol.Direccion_nodos:
+            if i == 'Arriba': aux = aux.Arriba
+            if i == 'Abajo': aux = aux.Abajo
+            if i == 'Derecha': aux = aux.Derecha
+            if i == 'Izquierda': aux = aux.Izquierda
+        else: return aux.Posicion_actual
