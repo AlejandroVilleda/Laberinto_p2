@@ -232,6 +232,7 @@ while True:
                     # Agregamos en la gráfica el valor de los nodos
                     if len(Nodos_por_agregar) == 1:
                         Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+
                     else:
                         Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
 

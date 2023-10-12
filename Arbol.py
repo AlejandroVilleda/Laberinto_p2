@@ -197,7 +197,6 @@ class Grafica:
             for It in range(Grafica.i, T):
                 self.tree.add_edge(self.Padre, self.Nodos[It])
 
-
         # Agregando nodos hijos
         if len(Grafica.Nodos_Ramificados) != 0:
             for k in range(len(self.Nodos_Ramificados)):
