@@ -141,11 +141,9 @@ letra_v = fuente_v.render('V', True, NEGRO) # Dibujar texto
 """
 EJECUCIÓN DEL CÓDIGO____________________________________________________"""
 
-#Creamos el arbol de desición con un nodo inicial
+#Creamos el arbol de desición con un nodo inicial y la gráfica del arbol
 ARBOL = Arbol()
-"""Posicion_inicial = [pos_y, pos_x]
-ARBOL.Agregar_nodo_LIFO(Nodo(pos_y, pos_x))
-ARBOL.Agregar(Posicion_inicial)"""
+Arbol_generado = Grafica()
 
 Posiciones_por_agregar = queue.Queue()  # Parametro principal de generar_nodos con direcciones
 Profundidad_decision = []   # Guardaremos la distancia entre las hojas y la última desición tomada en una lista
@@ -166,6 +164,8 @@ while True:
         Posicion_inicial = [pos_y, pos_x]
         ARBOL.Agregar_nodo_FIFO(Nodo(pos_y, pos_x))
         ARBOL.Generar_nodos(None)
+        Arbol_generado.Agregar_nodo(str(Posicion_inicial))
+        Arbol_generado.Generar_Nodos()
 
     else:
         # 1. ANALISIS DE LOS LADOS
@@ -229,6 +229,15 @@ while True:
                 for i in Nodos_por_agregar:
                     ARBOL.Agregar_nodo_FIFO(i)
 
+                    # Agregamos en la gráfica el valor de los nodos
+                    if len(Nodos_por_agregar) == 1:
+                        Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+                    else:
+                        Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
+
+                else:
+                    Arbol_generado.Generar_Nodos()
+
                 # Dado las direcciones de cada ramificación, generar nodo
                 for i in Posiciones_por_agregar_aux:
                     ARBOL.Generar_nodos(i)
@@ -254,6 +263,7 @@ while True:
                         Coordenadas = ARBOL.Coordenadas_nodo()
                     pos_y = Coordenadas[0]
                     pos_x = Coordenadas[1]
+                    Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
 
                     Numero_ramificaciones_disponibles[-1] = Numero_ramificaciones_disponibles[-1] - 1
                     pass
@@ -276,7 +286,7 @@ while True:
                             Coordenadas = ARBOL.Coordenadas_nodo()
                             pos_y = Coordenadas[0]
                             pos_x = Coordenadas[1]
-
+                        Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
                         pass
 
                 #Numero_ramificacion = Numero_ramificaciones_disponibles[-1]
@@ -285,9 +295,10 @@ while True:
                 """Regresar posición hasta la última desicion"""
                 # ARBOL.Eliminar_direccion_nodo()  Esto solo quita una instrucción
 
-
-
-    if pos_x == 14 and pos_y == 1: ganado = True  # De haber llegado a las coordenadas finales
+    # De haber llegado a las coordenadas finales, finalizamos el programa
+    if pos_x == 14 and pos_y == 1:
+        ganado = True
+        Arbol_generado.Graficar()
 
     """
     AGENO A MI__________________________________________________________"""
@@ -339,6 +350,7 @@ while True:
     if Direccion == "Abajo":   pos_y += 1
     if Direccion == "Derecha": pos_x += 1
     if Direccion == "Izquierda": pos_x -= 1
+    Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
 
     # Coordenadas de inicio.
     inicio_i = f'In'
