@@ -156,6 +156,8 @@ Numero_ramificaciones_disponibles = []
 while True:
     Posiciones_por_agregar_aux = []  # Parametro principal de generar_nodos sin importar su eliminación
     Nodos_por_agregar = []           # Guardar los nodos en una lista para después agregarlos todos al LIFO
+    Posicion_Actual = None
+
 
     areas_descubiertas[pos_y][pos_x] = True
     Direccion = None
@@ -177,8 +179,10 @@ while True:
             # almacenamos los nodos a los que solo hay que avanzar
             if matriz[Areas_Visitadas[i].Posicion_y][Areas_Visitadas[i].Posicion_x] == 1:
                 if ((Areas_Visitadas[i].Posicion_actual in ARBOL.Nodos_recorridos) is False) or (len(Arbol.Nodos_recorridos) == 0):
+
                     nodo = Nodo(Areas_Visitadas[i].Posicion_Y, Areas_Visitadas[i].Posicion_X, Areas_Visitadas[i].direccion)
 
+                    Posicion_Actual = ARBOL.Coordenadas_nodo()
                     Direccion = nodo.direccion
                     Nodos_por_agregar.append(nodo)  # ARBOL.Agregar_nodo_LIFO(nodo)
 
@@ -195,7 +199,7 @@ while True:
                         it += 1
 
                     Posiciones_por_agregar_aux.append(Direccion)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
 
 
 
@@ -209,11 +213,11 @@ while True:
 
             # contamos el número de hojas existentes y las guardamos
             if len(Nodos_por_agregar) > 1:
-                Valor_produndidad = ARBOL.Numero_Nodos - Valor_produndidad
+                Valor_produndidad = 1 if (ARBOL.Numero_Nodos - Valor_produndidad == 0) else ARBOL.Numero_Nodos - Valor_produndidad
                 Profundidad_decision.append(Valor_produndidad)
                 Valor_produndidad = ARBOL.Numero_Nodos
 
-                for j in Profundidad_decision:
+                for j in range(len(Profundidad_decision)):
                     if (0 in Profundidad_decision) is True:
                         Profundidad_decision.pop(j)
 
@@ -232,39 +236,48 @@ while True:
                 # Al acabar, ingresar en la lista de direcciones un elemento de las posiciones por agregar
                 Direccion = Posiciones_por_agregar.get()
                 ARBOL.Agregar_direccion_nodo(Direccion)
+                ARBOL.Ingresar_coordenadas(Posicion_Actual)
 
             # De no tener ninguna posible ramificación
             else:
                 Iteracion = Numero_ramificaciones_disponibles[-1]
                 Nodos_por_regresar = ARBOL.Numero_Nodos - Valor_produndidad
+                Posicion_Actual = ARBOL.Coordenadas_nodo()
 
                 if Iteracion - 1 >= 0:
                     for i in range(Nodos_por_regresar):
                         ARBOL.Eliminar_direccion_nodo()
 
-                    else: ARBOL.Agregar_direccion_nodo(Posiciones_por_agregar.get())
-                    Coordenadas = ARBOL.Coordenadas_nodo()
+                    else:
+                        ARBOL.Ingresar_coordenadas(Posicion_Actual)  # Ingresamos el nodo ya recorrido
+                        ARBOL.Agregar_direccion_nodo(Posiciones_por_agregar.get())  # Asignamos la nueva prioridad
+                        Coordenadas = ARBOL.Coordenadas_nodo()
                     pos_y = Coordenadas[0]
                     pos_x = Coordenadas[1]
 
                     Numero_ramificaciones_disponibles[-1] = Numero_ramificaciones_disponibles[-1] - 1
-                    if Numero_ramificaciones_disponibles[-1] == 0: Numero_ramificaciones_disponibles.pop()
                     pass
 
 
                 else:
-                    for i in range(Nodos_por_regresar):
-                        ARBOL.Eliminar_direccion_nodo()
+                    if (pos_x == 14 and pos_y == 1) is False:
+                        if Numero_ramificaciones_disponibles[-1] == 0: Numero_ramificaciones_disponibles.pop()
 
-                    for i in range(Profundidad_decision.pop()):
-                        ARBOL.Eliminar_direccion_nodo()
-                    else:
-                        ARBOL.Agregar_direccion_nodo(Posiciones_por_agregar.get())
-                    Coordenadas = ARBOL.Coordenadas_nodo()
-                    pos_y = Coordenadas[0]
-                    pos_x = Coordenadas[1]
+                        for i in range(Nodos_por_regresar):
+                            Posicion_Actual = ARBOL.Coordenadas_nodo()
+                            ARBOL.Eliminar_direccion_nodo()
+                            if (Posicion_Actual in ARBOL.Nodos_recorridos) is False:
+                                ARBOL.Ingresar_coordenadas(Posicion_Actual)
 
-                    pass
+                        for i in range(Profundidad_decision.pop()):
+                            ARBOL.Eliminar_direccion_nodo()
+                        else:
+                            ARBOL.Agregar_direccion_nodo(Posiciones_por_agregar.get())
+                            Coordenadas = ARBOL.Coordenadas_nodo()
+                            pos_y = Coordenadas[0]
+                            pos_x = Coordenadas[1]
+
+                        pass
 
                 #Numero_ramificacion = Numero_ramificaciones_disponibles[-1]
 

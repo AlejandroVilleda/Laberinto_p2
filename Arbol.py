@@ -44,7 +44,7 @@ class Arbol:
             Nuevo_Nodo: Nodo = Arbol.Nodos_por_incluir.get()  # Obtenemos el único nodo que debe existir en el queue
             self.Inicio = Nuevo_Nodo    # Lo ingresamos como inicio del arbol
 
-            Arbol.Nodos_recorridos.append(Nuevo_Nodo.Posicion_actual)  # Colocamos la posición del nodo como recorrido
+            # Arbol.Nodos_recorridos.append(Nuevo_Nodo.Posicion_actual)  # Colocamos la posición del nodo como recorrido
 
         # si no esta vacio
         else:
@@ -61,7 +61,7 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
                 aux.Arriba = Nuevo_nodo
-                Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Abajo":
                 aux = self.Inicio
@@ -75,7 +75,7 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
                 aux.Abajo = Nuevo_nodo
-                Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Derecha":
                 aux = self.Inicio
@@ -89,7 +89,7 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
                 aux.Derecha = Nuevo_nodo
-                Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Izquierda":
                 aux = self.Inicio
@@ -103,7 +103,7 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
                 aux.Izquierda = Nuevo_nodo
-                Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
 
             pass
 
@@ -124,6 +124,9 @@ class Arbol:
 
     # Verifica que el arbol esté vacio
     def Vacio(self): return self.Inicio == None
+
+    # Insertar la posición ya recorrida
+    def Ingresar_coordenadas(self, Posicion): self.Nodos_recorridos.append(Posicion)
 
     # Obtenemos las coordenadas del nodo actual
     def Coordenadas_nodo(self):
