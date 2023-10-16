@@ -5,51 +5,35 @@ from Arbol import *
 
 """
 FUNCIONES PRINCIPALES___________________________________________________"""
-
-# función creada para trabajar con la inserción de direcciones en orden
-def Agregar_elemento_Priorityqueue(Dato, Queue_vieja: queue, Posicion: int):
-    Nueva_Queue = queue.Queue()
-
-
-    if Posicion == 0:
-        Nueva_Queue.put(Dato)
-        for i in range(Queue_vieja.qsize()): Nueva_Queue.put(Queue_vieja.get())
-
-    else:
-        for i in range(Posicion):
-            Nueva_Queue.put(Queue_vieja.get())
-        Nueva_Queue.put(Dato)
-        for i in range(Queue_vieja.qsize()): Nueva_Queue.put(Queue_vieja.get())
-
-    return Nueva_Queue
-
 # Función que dibuja al meñeco
-def dibujar_muneco():
-    ventana.blit(muneco_img, (pos_x * TAMANO_CUADRO, pos_y * TAMANO_CUADRO))
+def dibujar_muneco(): ventana.blit(muneco_img, (pos_x * TAMANO_CUADRO, pos_y * TAMANO_CUADRO))
 
-# Funcion que visualiza los alrededores del muñeco
+# Devuelve una lista de objetos Nodos con las principales caracteristicas que necesitamos (posición y dirección)
 def sensor_mirar():
-    areas_descubiertas[pos_y][pos_x] = True
-    Lista_areas_descubiertas = [None]  # Guardamos aquí una lista de las areas descubiertas
-    Lista_Auxiliar = [None]   # ALmacena la posición de las areas
+    areas_descubiertas[pos_y][pos_x] = True  # Mostramos el área en el que nos encontramos
+    Lista_areas_descubiertas = [None]        # Guardamos aquí una lista de las áreas descubiertas
+    Lista_Auxiliar = [None]                  # Almacena la posición de las áreas
 
-
-    if pos_y - 1 >= 0: # Arriba
+    # Revisamos el elemento de arriba
+    if pos_y - 1 >= 0:
         areas_descubiertas[pos_y - 1][pos_x] = True
         Lista_Auxiliar = Nodo(pos_y - 1, pos_x, 'Arriba')
         Lista_areas_descubiertas.append(Lista_Auxiliar)
 
-    if pos_y + 1 < len(matriz):  # Abajo
+    # Revisamos el elemento de abajo
+    if pos_y + 1 < len(matriz):
         areas_descubiertas[pos_y + 1][pos_x] = True
         Lista_Auxiliar = Nodo(pos_y + 1, pos_x, 'Abajo')
         Lista_areas_descubiertas.append(Lista_Auxiliar)
 
-    if pos_x + 1 < len(matriz[0]): # Derecha
+    # Revisamos el elemento de la derecha
+    if pos_x + 1 < len(matriz[0]):
         areas_descubiertas[pos_y][pos_x + 1] = True
         Lista_Auxiliar = Nodo(pos_y, pos_x + 1, 'Derecha')
         Lista_areas_descubiertas.append(Lista_Auxiliar)
 
-    if pos_x - 1 >= 0: # Izquierda
+    # Revisamos el elemento de la izquierda
+    if pos_x - 1 >= 0:
         areas_descubiertas[pos_y][pos_x - 1] = True
         Lista_Auxiliar = Nodo(pos_y, pos_x - 1, 'Izquierda')
         Lista_areas_descubiertas.append(Lista_Auxiliar)
@@ -58,7 +42,6 @@ def sensor_mirar():
 
     # Eliminamos aquellos valores en la lista con valores nulos
     Lista_Auxiliar_2 = []
-    aux = 0
 
     # Recorremos la lista de areas visitadas en busqueda de iteraciones vacias
     for i in range(len(Lista_areas_descubiertas)):
@@ -71,9 +54,27 @@ def sensor_mirar():
             Lista_Auxiliar_2.pop()
             i-= 1
 
-            if  (i + 1 == len(Lista_Auxiliar_2) or len(Lista_Auxiliar_2) == 0): break
+            if  (i + 1 == len(Lista_Auxiliar_2) or len(Lista_Auxiliar_2) == 0): break   # condición para romper ciclo
 
     return Lista_areas_descubiertas
+
+
+# Devuelve un queue FIFO. Almacena las direcciones de las posibles ramificaciones a tomar bajo el criterio de prioridad
+def Agregar_elemento_Priorityqueue(Dato, Queue_vieja: queue, Posicion: int):
+    Nueva_Queue = queue.Queue()
+
+    # Algoritmo de insersión de datos de una FIFO QUEUE en una posición N
+    if Posicion == 0:
+        Nueva_Queue.put(Dato)
+        for i in range(Queue_vieja.qsize()): Nueva_Queue.put(Queue_vieja.get())
+
+    else:
+        for i in range(Posicion): Nueva_Queue.put(Queue_vieja.get())
+        Nueva_Queue.put(Dato)
+        for i in range(Queue_vieja.qsize()): Nueva_Queue.put(Queue_vieja.get())
+
+    return Nueva_Queue
+
 
 """
 PARAMETROS INICIALES____________________________________________________"""
@@ -88,17 +89,18 @@ GRIS = (128, 128, 128)      # Color gris
 matriz = []    # Matriz del laberinto
 ganado = False # Condicion principal
 
-# Coordenadas iniciales del muñequito
+# Coordenadas iniciales del muñequito.                          _______________________-CAMBIAR EN LA SIGUIENTE VERSION
 pos_x = 0
 pos_y = 9
+
 
 """
 GENERAR MATRIZ__________________________________________________________"""
 
-# Abre la matriz de lectura y lee la matriz
+# Abre el archivo .txt que contiene la matriz. La leemos y almacenamos
 with open('./Laberinto.txt', 'r') as f: lineas = f.readlines()
 
-# Iterar a través de las líneas y crear una lista de listas (matriz)
+# Iterar a través de las líneas leidas y crear una lista de listas (matriz)
 for linea in lineas:
     fila = [int(valor) for valor in linea.strip().split(',')]
     matriz.append(fila)
@@ -107,15 +109,13 @@ for linea in lineas:
 ANCHO = len(matriz[0]) * TAMANO_CUADRO
 ALTO = len(matriz) * TAMANO_CUADRO
 
-
 """
 INICIALIZAR PYGAME Y CARGAR VALORES_____________________________________"""
-# Inicializar pygame
-pygame.init()
+pygame.init()   # Inicializar pygame
 
 # Crear ventana
-ventana = pygame.display.set_mode((ANCHO, ALTO)) # Generar ventana
-pygame.display.set_caption("Laberinto")          # Nombre de la ventana
+ventana = pygame.display.set_mode((ANCHO, ALTO))    # Generar ventana
+pygame.display.set_caption("Laberinto")             # Nombre de la ventana
 
 # Cargar la imagen del muñeco y redimensionarla
 muneco_img = pygame.Surface((TAMANO_MUNEQUITO, TAMANO_MUNEQUITO))
@@ -145,161 +145,158 @@ EJECUCIÓN DEL CÓDIGO____________________________________________________"""
 ARBOL = Arbol()
 Arbol_generado = Grafica()
 
-Posiciones_por_agregar = queue.Queue()  # Parametro principal de generar_nodos con direcciones
-Profundidad_decision = []   # Guardaremos la distancia entre las hojas y la última desición tomada en una lista
-Valor_produndidad =  0       # Cuenta el número de hojas por cada desición
-Numero_ramificaciones_disponibles = []
+Ramificaciones_por_seguir = queue.Queue()  # Almacena la dirección de las ramificaciones a seguir bajo el criterio de prioridad
+Profundidad_inicial =  0                   # Almacena la profundidad del último nodo padre recorrido
+Profundidades = []                         # Almacena las profundidades entre cada nodo padre
+Numero_ramificaciones_disponibles = []     # Almacena el número de nodos disponibles por recorrer
 
-# Generar arbol y dibujar
+# Inicialización del algoritmo
 while True:
-    Posiciones_por_agregar_aux = []  # Parametro principal de generar_nodos sin importar su eliminación
-    Nodos_por_agregar = []           # Guardar los nodos en una lista para después agregarlos todos al LIFO
-    Posicion_Actual = None
-
-
+    # estas listas y variable se reiniciarán al comenzar un nuevo ciclo
+    Direcciones_por_agregar = []     # Almacena las direcciones a agregar al arbol bajo el orden de prioridad
+    Nodos_por_agregar = []      # Almacena los nodos a agregar al arbol bajo el orden de prioridad
+    Posicion_Actual = None      # Almacena la posición en la que nos encontramos en cada iteración
+    Direccion = None            # Almacena la dirección que vamos a agregar al nodo
     areas_descubiertas[pos_y][pos_x] = True
-    Direccion = None
 
+    # PASO 1. CREAR EL NODO RAÍZ. Solo ocurre en la primera iteración
     if ARBOL.Vacio():
+
+        # Creamos un objeto nodo con posición inicial y sin dirección en el arbol
         Posicion_inicial = [pos_y, pos_x]
         ARBOL.Agregar_nodo_FIFO(Nodo(pos_y, pos_x))
         ARBOL.Generar_nodos(None)
+
+        # Agregamos la posición inicial al arbol de graficación
         Arbol_generado.Agregar_nodo(str(Posicion_inicial))
         Arbol_generado.Generar_Nodos()
+        continue # Saltamos directamente a la siguiente iteración
 
-    else:
-        # 1. ANALISIS DE LOS LADOS
-        Areas_Visitadas = sensor_mirar()  # Adquirimos las areas descubiertas
-        it = 0
+    # PASO 2. ANÁLISIS DE LADOS DEL NODO. Conocemos las posiciones y direcciones de los elementos al rededor del punto
+    Areas_Visitadas = sensor_mirar()  # Adquirimos las áreas al rededor del punto
+    it = 0      # Cuenta el número de direcciones a recorrer en la Queue
 
-        # 2. FILTRAR LADOS
-        # Agregamos los nodos a los que podemos avanzar en un LIFO queue
-        for i in range(len(Areas_Visitadas)):
+    # PASO 3. FILTRAR LADOS. Registramos los datos de las áreas a las que podemos desplazarnos
+    # Iteramos cada lado visitado
+    for i in range(len(Areas_Visitadas)):
 
-            # almacenamos los nodos a los que solo hay que avanzar
-            if matriz[Areas_Visitadas[i].Posicion_y][Areas_Visitadas[i].Posicion_x] == 1:
-                if ((Areas_Visitadas[i].Posicion_actual in ARBOL.Nodos_recorridos) is False) or (len(Arbol.Nodos_recorridos) == 0):
+        # Si el área visitado es blanco y no lo hemos recorrido antes, registramos su posición y dirección
+        if matriz[Areas_Visitadas[i].Posicion_y][Areas_Visitadas[i].Posicion_x] == 1:
+            if (Areas_Visitadas[i].Posicion_actual in ARBOL.Nodos_visitados) is False:
 
-                    nodo = Nodo(Areas_Visitadas[i].Posicion_Y, Areas_Visitadas[i].Posicion_X, Areas_Visitadas[i].direccion)
-
-                    Posicion_Actual = ARBOL.Coordenadas_nodo()
-                    Direccion = nodo.direccion
-                    Nodos_por_agregar.append(nodo)  # ARBOL.Agregar_nodo_LIFO(nodo)
-
-                    if Posiciones_por_agregar.qsize() != 0 and i == 0:
-                        Posiciones_por_agregar = Agregar_elemento_Priorityqueue(Direccion, Posiciones_por_agregar, 0)
-                        it += 1
-
-                    elif Posiciones_por_agregar.qsize() != 0 and i != 0:
-                        Posiciones_por_agregar = Agregar_elemento_Priorityqueue(Direccion, Posiciones_por_agregar, it)
-                        it += 1
-
-                    elif Posiciones_por_agregar.qsize() == 0:
-                        Posiciones_por_agregar.put(Direccion)
-                        it += 1
-
-                    Posiciones_por_agregar_aux.append(Direccion)
-                    time.sleep(0.2)
-
-
-
-
-        # Una vez finalizado el analisis de los lados
-        else:
-
-            # Contamos el número de ramificaciones mayores a 1 y las contamos
-            if len(Posiciones_por_agregar_aux) > 1:
-                Numero_ramificaciones_disponibles.append(len(Posiciones_por_agregar_aux) - 1)
-
-            # contamos el número de hojas existentes y las guardamos
-            if len(Nodos_por_agregar) > 1:
-                Valor_produndidad = 1 if (ARBOL.Numero_Nodos - Valor_produndidad == 0) else ARBOL.Numero_Nodos - Valor_produndidad
-                Profundidad_decision.append(Valor_produndidad)
-                Valor_produndidad = ARBOL.Numero_Nodos
-
-                for j in range(len(Profundidad_decision)):
-                    if (0 in Profundidad_decision) is True:
-                        Profundidad_decision.pop(j)
-
-
-            # De tener al menos un camino a donde ir, procedemos con la creación de nodos
-            if len(Nodos_por_agregar) != 0:
-
-                # Coleccionamos en una queue los nodos por agregar
-                for i in Nodos_por_agregar:
-                    ARBOL.Agregar_nodo_FIFO(i)
-
-                    # Agregamos en la gráfica el valor de los nodos
-                    if len(Nodos_por_agregar) == 1:
-                        Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
-
-                    else:
-                        Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
-
-                else:
-                    Arbol_generado.Generar_Nodos()
-
-                # Dado las direcciones de cada ramificación, generar nodo
-                for i in Posiciones_por_agregar_aux:
-                    ARBOL.Generar_nodos(i)
-
-                # Al acabar, ingresar en la lista de direcciones un elemento de las posiciones por agregar
-                Direccion = Posiciones_por_agregar.get()
-                ARBOL.Agregar_direccion_nodo(Direccion)
-                ARBOL.Ingresar_coordenadas(Posicion_Actual)
-
-            # De no tener ninguna posible ramificación
-            else:
-                Iteracion = Numero_ramificaciones_disponibles[-1]
-                Nodos_por_regresar = ARBOL.Numero_Nodos - Valor_produndidad
+                # Almacenamos el nodo iterado y lo almacenamos para agregar al arbol
+                nodo = Nodo(Areas_Visitadas[i].Posicion_Y, Areas_Visitadas[i].Posicion_X, Areas_Visitadas[i].direccion)
+                Nodos_por_agregar.append(nodo)
                 Posicion_Actual = ARBOL.Coordenadas_nodo()
 
-                if Iteracion - 1 >= 0:
-                    for i in range(Nodos_por_regresar):
-                        ARBOL.Eliminar_direccion_nodo()
+                # Almacenamos dirección del nodo iterado y lo almacenamos para utilizarlo como dato iterador
+                Direccion = nodo.direccion
+                Direcciones_por_agregar.append(Direccion)
 
-                    else:
-                        ARBOL.Ingresar_coordenadas(Posicion_Actual)  # Ingresamos el nodo ya recorrido
-                        ARBOL.Agregar_direccion_nodo(Posiciones_por_agregar.get())  # Asignamos la nueva prioridad
-                        Coordenadas = ARBOL.Coordenadas_nodo()
-                    pos_y = Coordenadas[0]
-                    pos_x = Coordenadas[1]
-                    Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
-
-                    Numero_ramificaciones_disponibles[-1] = Numero_ramificaciones_disponibles[-1] - 1
-                    pass
-
+                # Algoritmo para almacenar direcciones al Queue
+                if Ramificaciones_por_seguir.qsize() == 0:
+                    Ramificaciones_por_seguir.put(Direccion)
+                    it += 1
 
                 else:
-                    if (pos_x == 14 and pos_y == 1) is False:
-                        if Numero_ramificaciones_disponibles[-1] == 0: Numero_ramificaciones_disponibles.pop()
+                    Ramificaciones_por_seguir = Agregar_elemento_Priorityqueue(Direccion, Ramificaciones_por_seguir, it)
+                    it += 1
 
-                        for i in range(Nodos_por_regresar):
-                            Posicion_Actual = ARBOL.Coordenadas_nodo()
-                            ARBOL.Eliminar_direccion_nodo()
-                            if (Posicion_Actual in ARBOL.Nodos_recorridos) is False:
-                                ARBOL.Ingresar_coordenadas(Posicion_Actual)
+    # PASO 4. INSERTAR DATOS AL ÁRBOL
+    else:
 
-                        for i in range(Profundidad_decision.pop()):
-                            ARBOL.Eliminar_direccion_nodo()
-                        else:
-                            ARBOL.Agregar_direccion_nodo(Posiciones_por_agregar.get())
-                            Coordenadas = ARBOL.Coordenadas_nodo()
-                            pos_y = Coordenadas[0]
-                            pos_x = Coordenadas[1]
-                        Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
-                        pass
+        # Almacenamos el número de nodos disponibles a ingresar (N - 1). Eliminamos uno porque ya lo recorreremos
+        if len(Nodos_por_agregar) > 1:
+            Numero_ramificaciones_disponibles.append(len(Direcciones_por_agregar) - 1)
 
-                #Numero_ramificacion = Numero_ramificaciones_disponibles[-1]
+            # Almacenamos la profundidad entre la hoja actual y el nodo padre
+            Profundidad_inicial = ARBOL.Numero_Nodos - Profundidad_inicial  # Profundidad final - Profundidad inicial
+            Profundidades.append(Profundidad_inicial)   # Almacenamos
+            Profundidad_inicial = ARBOL.Numero_Nodos    # actualizamos la profundidad inicial
 
+        # De tener al menos un camino a donde ir, procedemos con la creación de nodos en el arbol
+        if len(Nodos_por_agregar) != 0:
 
-                """Regresar posición hasta la última desicion"""
-                # ARBOL.Eliminar_direccion_nodo()  Esto solo quita una instrucción
+            # Coleccionamos en una queue los nodos por agregar
+            for i in Nodos_por_agregar:
+                ARBOL.Agregar_nodo_FIFO(i)
+
+                # Agregamos en la gráfica el valor de los nodos
+                if len(Nodos_por_agregar) == 1: Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+                else: Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
+
+            else: Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
+
+            # Dado las direcciones de cada ramificación, generar nodo en el arbol
+            for i in Direcciones_por_agregar: ARBOL.Generar_nodos(i)
+
+            # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición
+            Direccion = Ramificaciones_por_seguir.get()
+            ARBOL.Agregar_direccion(Direccion)
+            ARBOL.Agregar_posicion(Posicion_Actual)
+
+        # PASO 5. GENERAR RAMIFICACIONES
+        # De no tener ninguna ramificación
+        else:
+            Posicion_Actual = ARBOL.Coordenadas_nodo()
+            Iteracion = Numero_ramificaciones_disponibles[-1]  # Almacenamos el número de ramas disponibles a tomar
+            Nodos_por_regresar = ARBOL.Numero_Nodos - Profundidad_inicial   # Regresamos N números hasta el nodo padre
+
+            # Si tenemos ramificaciones disponibles en el nodo, tomamos la otra ramificación más proxima
+            if Iteracion - 1 >= 0:
+                for i in range(Nodos_por_regresar): ARBOL.Eliminar_direccion_nodo()  # Eliminamos la dirección a seguir
+
+                ARBOL.Agregar_direccion(Ramificaciones_por_seguir.get())  # Asignamos el siguiente valor de la prioridad
+                ARBOL.Agregar_posicion(Posicion_Actual)  # Registramos el nodo anterior como recorrido
+
+                # Obtenemos la posición actual y la tomamos
+                Coordenadas = ARBOL.Coordenadas_nodo()
+                pos_y = Coordenadas[0]
+                pos_x = Coordenadas[1]
+
+                Arbol_generado.Agregar_Padre(str([pos_y, pos_x])) # almacenamos al nuevo padre a graficar
+                Numero_ramificaciones_disponibles[-1] -= 1  # Restamos una rama ya que ya la acabamos de tomar
+                pass
+
+            # Si ya no tenemos ramificaciones disponibles
+            else:
+                # Si no hemos llegado al destino
+                if (pos_x == 14 and pos_y == 1) is False:
+
+                    # eliminamos todos los valores 0 en las ramificaciones existentes
+                    Numero_ramificaciones_disponibles_F = [num for num in Numero_ramificaciones_disponibles if num != 0]
+                    Numero_ramificaciones_disponibles = Numero_ramificaciones_disponibles_F
+
+                    # Eliminamos los nodos hijos hasta el último nodo padre
+                    for i in range(Nodos_por_regresar):
+                        Posicion_Actual = ARBOL.Coordenadas_nodo()
+                        ARBOL.Eliminar_direccion_nodo()
+
+                        # Almacenamos la posición actual como recorrido en caso de no estarlo
+                        if (Posicion_Actual in ARBOL.Nodos_visitados) is False: ARBOL.Agregar_posicion(Posicion_Actual)
+
+                    # regresamos a la última desición tomada
+                    for i in range(Profundidades.pop()): ARBOL.Eliminar_direccion_nodo()
+
+                    # Tomamos la siguiente ramificación bajo el criterio de prioridad y obtenemos la posición actual
+                    else:
+                        ARBOL.Agregar_direccion(Ramificaciones_por_seguir.get())
+                        Coordenadas = ARBOL.Coordenadas_nodo()
+                        pos_y = Coordenadas[0]
+                        pos_x = Coordenadas[1]
+                    Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
+                    Numero_ramificaciones_disponibles[-1] -= 1  # restamos la ramificación disponible
+
+                    # Actualiando el valor de la profundidad inicial
+                    aux_p = 0
+                    for u in Profundidades: aux_p = u + aux_p
+                    else: Profundidad_inicial = aux_p
+
+                    pass
 
     # De haber llegado a las coordenadas finales, finalizamos el programa
-    if pos_x == 14 and pos_y == 1:
-        ganado = True
-        Arbol_generado.Graficar()
+    if pos_x == 14 and pos_y == 1: ganado = True
+    time.sleep(0.2)
 
     """
     AGENO A MI__________________________________________________________"""
@@ -340,7 +337,7 @@ while True:
         sys.exit()
 
     # Mostrar coordenadas generales en la ventana
-    coordenadas = f'Coordenadas: ({pos_y}, {pos_x})'
+    coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
     texto = fuente.render(coordenadas, True, BLANCO)
     ventana.blit(texto, (10, 10))
     pygame.display.update()
@@ -365,4 +362,4 @@ while True:
 
     pygame.display.update()
 
-
+    if pos_x == 14 and pos_y == 1: Arbol_generado.Graficar()

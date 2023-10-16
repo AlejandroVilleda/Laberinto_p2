@@ -33,9 +33,9 @@ class Nodo:
 class Arbol:
 
     # Variables de la clase
-    Nodos_por_incluir = queue.Queue()  # Cola de prioridad para insertar nodos al arbol
-    Nodos_recorridos: list = []      # Lista de nodos ya recorridos en el arbol
-    Direccion_nodos: list = []       # Lista de direcciones para llegar a la hoja
+    Nodos_por_agregar = queue.Queue()  # Cola de prioridad para insertar nodos al arbol
+    Nodos_visitados: list = []      # Lista de nodos ya recorridos en el arbol
+    Direcciones_generadas: list = []       # Lista de direcciones para llegar a la hoja
 
     # Inicio del arbol vacio
     def __init__(self): self.Inicio = None
@@ -44,10 +44,10 @@ class Arbol:
 
         # Si esta vacio el arbol
         if self.Vacio() == True:
-            Nuevo_Nodo: Nodo = Arbol.Nodos_por_incluir.get()  # Obtenemos el único nodo que debe existir en el queue
+            Nuevo_Nodo: Nodo = Arbol.Nodos_por_agregar.get()  # Obtenemos el único nodo que debe existir en el queue
             self.Inicio = Nuevo_Nodo    # Lo ingresamos como inicio del arbol
 
-            # Arbol.Nodos_recorridos.append(Nuevo_Nodo.Posicion_actual)  # Colocamos la posición del nodo como recorrido
+            # Arbol.Nodos_visitados.append(Nuevo_Nodo.Posicion_actual)  # Colocamos la posición del nodo como recorrido
 
         # si no esta vacio
         else:
@@ -56,87 +56,87 @@ class Arbol:
                 aux = self.Inicio
 
                 # Llegamos a la hoja siguiendo las respectivas desiciones generadas
-                for i in Arbol.Direccion_nodos:
+                for i in Arbol.Direcciones_generadas:
                     if i == 'Arriba': aux = aux.Arriba
                     if i == 'Abajo': aux = aux.Abajo
                     if i == 'Derecha': aux = aux.Derecha
                     if i == 'Izquierda': aux = aux.Izquierda
 
-                Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
+                Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Arriba = Nuevo_nodo
-                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Abajo":
                 aux = self.Inicio
 
                 # Llegamos a la hoja siguiendo las respectivas desiciones generadas
-                for i in Arbol.Direccion_nodos:
+                for i in Arbol.Direcciones_generadas:
                     if i == 'Arriba': aux = aux.Arriba
                     if i == 'Abajo': aux = aux.Abajo
                     if i == 'Derecha': aux = aux.Derecha
                     if i == 'Izquierda': aux = aux.Izquierda
 
-                Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
+                Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Abajo = Nuevo_nodo
-                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Derecha":
                 aux = self.Inicio
 
                 # Llegamos a la hoja siguiendo las respectivas desiciones generadas
-                for i in Arbol.Direccion_nodos:
+                for i in Arbol.Direcciones_generadas:
                     if i == 'Arriba': aux = aux.Arriba
                     if i == 'Abajo': aux = aux.Abajo
                     if i == 'Derecha': aux = aux.Derecha
                     if i == 'Izquierda': aux = aux.Izquierda
 
-                Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
+                Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Derecha = Nuevo_nodo
-                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Izquierda":
                 aux = self.Inicio
 
                 # Llegamos a la hoja siguiendo las respectivas desiciones generadas
-                for i in Arbol.Direccion_nodos:
+                for i in Arbol.Direcciones_generadas:
                     if i == 'Arriba': aux = aux.Arriba
                     if i == 'Abajo': aux = aux.Abajo
                     if i == 'Derecha': aux = aux.Derecha
                     if i == 'Izquierda': aux = aux.Izquierda
 
-                Nuevo_nodo: Nodo = Arbol.Nodos_por_incluir.get()
+                Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Izquierda = Nuevo_nodo
-                #Arbol.Nodos_recorridos.append(Nuevo_nodo.Posicion_actual)
+                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
 
             pass
 
 
 
     # Agregamos los nodos a una queue para posteriormente ingresarlos en el arbol
-    def Agregar_nodo_FIFO(self, nodo): self.Nodos_por_incluir.put(nodo)
+    def Agregar_nodo_FIFO(self, nodo): self.Nodos_por_agregar.put(nodo)
 
     # Agregamos la dirección o ruta que debe seguir el arbol para ingresar el nodo
-    def Agregar_direccion_nodo(self, direccion): self.Direccion_nodos.append(direccion)
+    def Agregar_direccion(self, direccion): self.Direcciones_generadas.append(direccion)
 
     # Eliminamos la últma ruta que debe seguir el arbol
-    def Eliminar_direccion_nodo(self): self.Direccion_nodos.pop()
+    def Eliminar_direccion_nodo(self): self.Direcciones_generadas.pop()
 
     # Contamos el número de hojas en toda la ramificación del arbol
     @property
-    def Numero_Nodos(self): return len(self.Direccion_nodos)
+    def Numero_Nodos(self): return len(self.Direcciones_generadas)
 
     # Verifica que el arbol esté vacio
     def Vacio(self): return self.Inicio == None
 
     # Insertar la posición ya recorrida
-    def Ingresar_coordenadas(self, Posicion): self.Nodos_recorridos.append(Posicion)
+    def Agregar_posicion(self, Posicion): self.Nodos_visitados.append(Posicion)
 
     # Obtenemos las coordenadas del nodo actual
     def Coordenadas_nodo(self):
         aux: Nodo = self.Inicio
 
         # Llegamos a la hoja siguiendo las respectivas desiciones generadas
-        for i in Arbol.Direccion_nodos:
+        for i in Arbol.Direcciones_generadas:
             if i == 'Arriba': aux = aux.Arriba
             if i == 'Abajo': aux = aux.Abajo
             if i == 'Derecha': aux = aux.Derecha
