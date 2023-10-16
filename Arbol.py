@@ -159,17 +159,19 @@ class Grafica:
         Grafica.Nodos.append(Coordenadas)
 
         # Asignando valores al padre del nodo
-        if (len(self.Nodos) > 1) and Grafica.i == 1:
+        if (len(self.Nodos) == 1) and Grafica.i == 1:   # ERROR EN EL NODO 11 [1,3]
+            if self.tree.size() == 1:
                 self.Padre = None
+
         else:
             if self.Padre == None: self.Padre = self.Nodos[0]
-
-            """
-                    if (len(self.Nodos) > 1) and Grafica.i == 1:
-                            self.Padre = None
-                    elif (len(self.Nodos) == 1) and Grafica.i >= 1:
-                        if self.Padre == None: self.Padre = self.Nodos[0]
-            """
+            # elif (len(self.Nodos) == 1) and Grafica.i != 1: self.Padre = self.Nodos[0]
+        """
+        if (len(self.Nodos) > 1) and Grafica.i == 1:
+                self.Padre = None
+        elif (len(self.Nodos) == 1) and Grafica.i >= 1:
+            if self.Padre == None: self.Padre = self.Nodos[0]
+        """
 
     # Agregamos nodos que corresponda a ramificaciones mayores a 1
     def Agregar_ramificacion(self, Coordenadas):
@@ -180,22 +182,23 @@ class Grafica:
     # De las funciones anteriores, ingresamos los nodos al arbol
     def Generar_Nodos(self):
         It = Grafica.i
-        # Agregando al nodo
+
+        # Agregando al nodo                         SE REINICIA AQUI elif (len(self.Nodos) == 1) and Grafica.i >= 1:
         for Grafica.i in range(len(self.Nodos)):
             self.tree.add_node(self.Nodos[Grafica.i])
 
         # Uniendo los nodos
-        if len(self.Nodos) > 1 and Grafica.i != 0:  # MODIFICAR I = 1
+        if len(self.Nodos) > 1 and Grafica.i >= 1:  # MODIFICAR I = 1
             T = len(self.Nodos)
             for It in range(Grafica.i, T):
                 if It - 1 != -1:
                     self.tree.add_edge(self.Nodos[It - 1], self.Nodos[It])
 
         # Unimos las ramificaciones mediante el padre
-        if len(self.Nodos) == 1 and Grafica.i != 1:
+        if (len(self.Nodos) == 1 and It > 1) or (self.tree.size() > 1 and len(self.Nodos) == 1) and (len(self.Nodos_Ramificados) != 0): # CHECAR PQ NO ESTA BIEN________________________________
             T = len(self.Nodos)
             for It in range(Grafica.i, T):
-                self.tree.add_edge(self.Padre, self.Nodos[It])
+                if (self.Padre != self.Nodos[It]): self.tree.add_edge(self.Padre, self.Nodos[It])
 
         # Agregando nodos hijos
         if len(Grafica.Nodos_Ramificados) != 0:

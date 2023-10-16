@@ -31,4 +31,3 @@ for i in range(5):
     print("Paou")
     tree.add_node((6, i))
     tree.add_node((i, 3))
-
