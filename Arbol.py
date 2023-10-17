@@ -47,8 +47,6 @@ class Arbol:
             Nuevo_Nodo: Nodo = Arbol.Nodos_por_agregar.get()  # Obtenemos el único nodo que debe existir en el queue
             self.Inicio = Nuevo_Nodo    # Lo ingresamos como inicio del arbol
 
-            # Arbol.Nodos_visitados.append(Nuevo_Nodo.Posicion_actual)  # Colocamos la posición del nodo como recorrido
-
         # si no esta vacio
         else:
             # Evaluamos las direcciones en las que debemos desarrollar el arbol
@@ -64,7 +62,6 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Arriba = Nuevo_nodo
-                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Abajo":
                 aux = self.Inicio
@@ -78,7 +75,6 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Abajo = Nuevo_nodo
-                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Derecha":
                 aux = self.Inicio
@@ -92,7 +88,6 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Derecha = Nuevo_nodo
-                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
 
             if Direccion == "Izquierda":
                 aux = self.Inicio
@@ -106,8 +101,6 @@ class Arbol:
 
                 Nuevo_nodo: Nodo = Arbol.Nodos_por_agregar.get()
                 aux.Izquierda = Nuevo_nodo
-                #Arbol.Nodos_visitados.append(Nuevo_nodo.Posicion_actual)
-
             pass
 
 
@@ -150,82 +143,77 @@ class Grafica:
     Nodos = []
     Nodos_Ramificados = []
     Padre = None
-    i = 1
+    i = 0
 
     def __init__(self): self.tree = nx.DiGraph()
 
-    # Agregar nodos para graficar
+    # Agregar nodos a una lista para agregarlos al arbol después
     def Agregar_nodo(self, Coordenadas):
-        Grafica.Nodos.append(Coordenadas)
 
         # Asignando valores al padre del nodo
-        if (len(self.Nodos) == 1) and Grafica.i == 1:   # ERROR EN EL NODO 11 [1,3]
-            if self.tree.size() == 1:
-                self.Padre = None
+        if self.tree.size() == 0: self.Padre = None         # Caso inicial: t(0)
+        elif self.Padre == None: self.Padre = self.Nodos[0] # Caso Inicial + 1:  t(1)
 
-        else:
-            if self.Padre == None: self.Padre = self.Nodos[0]
-            # elif (len(self.Nodos) == 1) and Grafica.i != 1: self.Padre = self.Nodos[0]
-        """
-        if (len(self.Nodos) > 1) and Grafica.i == 1:
-                self.Padre = None
-        elif (len(self.Nodos) == 1) and Grafica.i >= 1:
-            if self.Padre == None: self.Padre = self.Nodos[0]
-        """
+        Grafica.Nodos.append(Coordenadas)
 
-    # Agregamos nodos que corresponda a ramificaciones mayores a 1
+
+    # Agregamos hijos de un nodo hoja a una lista para agregarlos al arbol después
     def Agregar_ramificacion(self, Coordenadas):
-        self.Padre = self.Nodos[-1]
-
+        self.Padre = self.Nodos[-1] # el padre será el nodo hoja
         Grafica.Nodos_Ramificados.append(Coordenadas)
 
-    # De las funciones anteriores, ingresamos los nodos al arbol
+
+    # Almacenar nodos al arbol
     def Generar_Nodos(self):
-        It = Grafica.i
+        It = Grafica.i  # Iterador
 
-        # Agregando al nodo                         SE REINICIA AQUI elif (len(self.Nodos) == 1) and Grafica.i >= 1:
-        for Grafica.i in range(len(self.Nodos)):
-            self.tree.add_node(self.Nodos[Grafica.i])
+        # Agregamos los nodos dentro del arbol
+        for x in range(Grafica.i, len(self.Nodos)): self.tree.add_node(self.Nodos[x])
 
-        # Uniendo los nodos
-        if len(self.Nodos) > 1 and Grafica.i >= 1:  # MODIFICAR I = 1
-            T = len(self.Nodos)
-            for It in range(Grafica.i, T):
-                if It - 1 != -1:
-                    self.tree.add_edge(self.Nodos[It - 1], self.Nodos[It])
+        # Unimos los elementos siempre que existan más de un nodo almacenado
+        #Requerimos mínimo 2 elementos para comenzar a unificarlos
+        if len(self.Nodos) > 1 and Grafica.i >= 1:
+            # Unimos nodos como: [Padre] -- [n] -- [n + 1] -- [n + 2]
+            for x in range(Grafica.i, len(self.Nodos)): self.tree.add_edge(self.Nodos[x - 1], self.Nodos[x])
 
-        # Unimos las ramificaciones mediante el padre
-        if (len(self.Nodos) == 1 and It > 1) or (self.tree.size() > 1 and len(self.Nodos) == 1) and (len(self.Nodos_Ramificados) != 0): # CHECAR PQ NO ESTA BIEN________________________________
-            T = len(self.Nodos)
-            for It in range(Grafica.i, T):
-                if (self.Padre != self.Nodos[It]): self.tree.add_edge(self.Padre, self.Nodos[It])
+        # Unimos los nuevos elementos al padre proveniente de una ramificación, generando otra ramificación
+        if (len(self.Nodos) == 1 and It > 1) or (len(self.Nodos) == 1 and self.tree.size() > 1) and (len(self.Nodos_Ramificados) == 0): # CHECAR PQ NO ESTA BIEN________________________________
+            for x in range(Grafica.i, len(self.Nodos)):
+                if (self.Padre != self.Nodos[x]): self.tree.add_edge(self.Padre, self.Nodos[x])
 
-        # Agregando nodos hijos
+        # Agregando los hijos de un nodo siemrpe que existan
         if len(Grafica.Nodos_Ramificados) != 0:
-            for k in range(len(self.Nodos_Ramificados)):
-                self.tree.add_node(self.Nodos_Ramificados[k])
+            for k in range(len(self.Nodos_Ramificados)): self.tree.add_node(self.Nodos_Ramificados[k])
 
-            # Uniendo los nodos ramificados
-            for k in range(len(self.Nodos_Ramificados)):
-                self.tree.add_edge(self.Padre, self.Nodos_Ramificados[k])
-            else:
+            # Uniendo los nodos ramificados con su respectivo padre
+            for k in range(len(self.Nodos_Ramificados)): self.tree.add_edge(self.Padre, self.Nodos_Ramificados[k])
+
+            else: # al finalizar limpiamos los datos y reseteamos el iterador
                 Grafica.Nodos.clear()
+                Grafica.i = -1
 
         Grafica.Nodos_Ramificados.clear()
-        Grafica.i += 1
+        Grafica.i += 1  # Avanzamos una posición al siguiente nodo
         pass
 
+    # Actualiza el valor del padre en caso de saltos en el arbol
     def Agregar_Padre(self, Posicion):
         self.Padre = Posicion
+
+    # Forzamos un reseteo de datos en caso de saltos en el arbol
+    def Resetear(self):
+        self.Nodos.clear()
+        Grafica.i = 0
+
+    # Generamos la gráfica del arbol en una ventana
     def Graficar(self):
         tree = self.tree
-        pos = nx.kamada_kawai_layout(tree, scale=1)
+        pos = nx.kamada_kawai_layout(tree, scale=1) # Orientanción
 
         # Dibujar el árbol
         plt.figure(figsize=(4, 8))  # Tamaño de la figura
         nx.draw(tree, pos, with_labels=True, node_size=400, node_color='lightblue', font_size=8, arrows=False)
-        # Centrar el árbol en la figura
-        plt.margins(0.2, 0.1)
+        plt.margins(0.2, 0.1)  # Centrar el árbol en la figura
         plt.axis('off')  # Ocultar ejes
 
         plt.show()

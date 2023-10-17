@@ -222,8 +222,10 @@ while True:
                 ARBOL.Agregar_nodo_FIFO(i)
 
                 # Agregamos en la gráfica el valor de los nodos
-                if len(Nodos_por_agregar) == 1: Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
-                else: Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
+                if len(Nodos_por_agregar) == 1:
+                    Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+                else:
+                    Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
 
             else: Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
 
@@ -253,8 +255,8 @@ while True:
                 Coordenadas = ARBOL.Coordenadas_nodo()
                 pos_y = Coordenadas[0]
                 pos_x = Coordenadas[1]
-
                 Arbol_generado.Agregar_Padre(str([pos_y, pos_x])) # almacenamos al nuevo padre a graficar
+                Arbol_generado.Resetear()   # Forzamos a un reseteo debido a un cambio de ramificación
                 Numero_ramificaciones_disponibles[-1] -= 1  # Restamos una rama ya que ya la acabamos de tomar
                 pass
 
@@ -285,13 +287,13 @@ while True:
                         pos_y = Coordenadas[0]
                         pos_x = Coordenadas[1]
                     Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
+                    Arbol_generado.Resetear()   # Forzamos a un reseteo debido a un cambio de ramificación
                     Numero_ramificaciones_disponibles[-1] -= 1  # restamos la ramificación disponible
 
                     # Actualiando el valor de la profundidad inicial
                     aux_p = 0
                     for u in Profundidades: aux_p = u + aux_p
                     else: Profundidad_inicial = aux_p
-
                     pass
 
     # De haber llegado a las coordenadas finales, finalizamos el programa
