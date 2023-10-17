@@ -92,7 +92,12 @@ ganado = False # Condicion principal
 # Coordenadas iniciales del muñequito.                          _______________________-CAMBIAR EN LA SIGUIENTE VERSION
 pos_x = 0
 pos_y = 9
-
+pos_x_inicio = pos_x
+pos_y_inicio = pos_y
+pos_x_final = 4
+pos_y_final = 6
+# x = 4, y = 6
+# x = 14, y = 1
 
 """
 GENERAR MATRIZ__________________________________________________________"""
@@ -263,22 +268,33 @@ while True:
             # Si ya no tenemos ramificaciones disponibles
             else:
                 # Si no hemos llegado al destino
-                if (pos_x == 14 and pos_y == 1) is False:
+                if (pos_x == pos_x_final and pos_y == pos_y_final) is False:
 
-                    # eliminamos todos los valores 0 en las ramificaciones existentes
-                    Numero_ramificaciones_disponibles_F = [num for num in Numero_ramificaciones_disponibles if num != 0]
-                    Numero_ramificaciones_disponibles = Numero_ramificaciones_disponibles_F
+                    # Realizamos esto hasta que cambiemos de ramificación
+                    while(Numero_ramificaciones_disponibles[-1] == 0):
 
-                    # Eliminamos los nodos hijos hasta el último nodo padre
-                    for i in range(Nodos_por_regresar):
-                        Posicion_Actual = ARBOL.Coordenadas_nodo()
-                        ARBOL.Eliminar_direccion_nodo()
+                        # eliminamos todos los valores 0 en las ramificaciones existentes
+                        Numero_ramificaciones_disponibles.pop()
 
-                        # Almacenamos la posición actual como recorrido en caso de no estarlo
-                        if (Posicion_Actual in ARBOL.Nodos_visitados) is False: ARBOL.Agregar_posicion(Posicion_Actual)
+                        # Eliminamos los nodos hijos hasta el último nodo padre
+                        for i in range(Nodos_por_regresar):
+                            Posicion_Actual = ARBOL.Coordenadas_nodo()
+                            ARBOL.Eliminar_direccion_nodo()
 
-                    # regresamos a la última desición tomada
-                    for i in range(Profundidades.pop()): ARBOL.Eliminar_direccion_nodo()
+                            # Almacenamos la posición actual como recorrido en caso de no estarlo
+                            if (Posicion_Actual in ARBOL.Nodos_visitados) is False: ARBOL.Agregar_posicion(Posicion_Actual)
+
+                        # regresamos a la última desición tomada
+                        for i in range(Profundidades.pop()): ARBOL.Eliminar_direccion_nodo()
+
+                        # Actualiando el valor de la profundidad inicial
+                        aux_p = 0
+                        for u in Profundidades:
+                            aux_p = u + aux_p
+                        else:
+                            Profundidad_inicial = aux_p
+                        Nodos_por_regresar = ARBOL.Numero_Nodos - Profundidad_inicial
+                        pass
 
                     # Tomamos la siguiente ramificación bajo el criterio de prioridad y obtenemos la posición actual
                     else:
@@ -294,10 +310,11 @@ while True:
                     aux_p = 0
                     for u in Profundidades: aux_p = u + aux_p
                     else: Profundidad_inicial = aux_p
+                    Nodos_por_regresar = ARBOL.Numero_Nodos - Profundidad_inicial
                     pass
 
     # De haber llegado a las coordenadas finales, finalizamos el programa
-    if pos_x == 14 and pos_y == 1: ganado = True
+    if pos_x == pos_x_final and pos_y == pos_y_final: ganado = True
     time.sleep(0.2)
 
     """
@@ -318,26 +335,6 @@ while True:
                 ventana.blit(letra_v, letra_v_rect)
 
 
-
-    # En caso de haber llegado al punto final
-    if ganado:
-        mensaje = '¡Haz ganado!'
-        fuente_ganado = pygame.font.Font(None, 36)
-        mensaje_renderizado = fuente_ganado.render(mensaje, True, BLANCO)
-        ventana.blit\
-            (mensaje_renderizado,
-             (
-                 ANCHO // 2 - mensaje_renderizado.get_width() // 2,
-                 ALTO // 2 - mensaje_renderizado.get_height() // 2
-             )
-            )
-
-        pygame.display.update()
-        pygame.time.delay(5000)  # Espera 5 segundos
-
-        pygame.quit()
-        sys.exit()
-
     # Mostrar coordenadas generales en la ventana
     coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
     texto = fuente.render(coordenadas, True, BLANCO)
@@ -355,13 +352,30 @@ while True:
     # Coordenadas de inicio.
     inicio_i = f'In'
     ini_i = fuente.render(inicio_i, True, NEGRO)
-    ventana.blit(ini_i, (0, 9 * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
+    ventana.blit(ini_i, (pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
 
     inicio_f = f'F'
     ini_f = fuente.render(inicio_f, True, NEGRO)
     ventana.blit(ini_f,
-                 (14 * TAMANO_CUADRO, 1 * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
+                 (pos_x_final * TAMANO_CUADRO, pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
 
     pygame.display.update()
 
-    if pos_x == 14 and pos_y == 1: Arbol_generado.Graficar()
+    # En caso de haber llegado al punto final
+    if ganado:
+        mensaje = '¡Haz ganado!'
+        fuente_ganado = pygame.font.Font(None, 36)
+        mensaje_renderizado = fuente_ganado.render(mensaje, True, BLANCO)
+        ventana.blit\
+            (mensaje_renderizado,
+             (
+                 ANCHO // 2 - mensaje_renderizado.get_width() // 2,
+                 ALTO // 2 - mensaje_renderizado.get_height() // 2
+             )
+            )
+
+        pygame.display.update()
+        Arbol_generado.Graficar()
+        pygame.time.delay(3000)  # Espera 3 segundos
+        pygame.quit()
+        sys.exit()
