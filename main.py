@@ -9,30 +9,31 @@ FUNCIONES PRINCIPALES___________________________________________________"""
 def dibujar_muneco(): ventana.blit(muneco_img, (pos_x * TAMANO_CUADRO, pos_y * TAMANO_CUADRO))
 
 # Devuelve una lista de objetos Nodos con las principales caracteristicas que necesitamos (posición y dirección)
-def sensor_mirar():
+def sensor_mirar(Orden: list):
     areas_descubiertas[pos_y][pos_x] = True  # Mostramos el área en el que nos encontramos
     Lista_areas_descubiertas = [None]        # Guardamos aquí una lista de las áreas descubiertas
     Lista_Auxiliar = [None]                  # Almacena la posición de las áreas
 
-    # Revisamos el elemento de arriba
+    # Revisamos el elemento de ARRIBA
     if pos_y - 1 >= 0:
         areas_descubiertas[pos_y - 1][pos_x] = True
         Lista_Auxiliar = Nodo(pos_y - 1, pos_x, 'Arriba')
         Lista_areas_descubiertas.append(Lista_Auxiliar)
 
-    # Revisamos el elemento de abajo
+    # Revisamos el elemento de ABAJO
     if pos_y + 1 < len(matriz):
         areas_descubiertas[pos_y + 1][pos_x] = True
         Lista_Auxiliar = Nodo(pos_y + 1, pos_x, 'Abajo')
         Lista_areas_descubiertas.append(Lista_Auxiliar)
 
-    # Revisamos el elemento de la derecha
+    # Revisamos el elemento de la DERECHA
     if pos_x + 1 < len(matriz[0]):
         areas_descubiertas[pos_y][pos_x + 1] = True
         Lista_Auxiliar = Nodo(pos_y, pos_x + 1, 'Derecha')
         Lista_areas_descubiertas.append(Lista_Auxiliar)
 
-    # Revisamos el elemento de la izquierda
+
+    # Revisamos el elemento de la IZQUIERDA
     if pos_x - 1 >= 0:
         areas_descubiertas[pos_y][pos_x - 1] = True
         Lista_Auxiliar = Nodo(pos_y, pos_x - 1, 'Izquierda')
@@ -43,7 +44,7 @@ def sensor_mirar():
     # Eliminamos aquellos valores en la lista con valores nulos
     Lista_Auxiliar_2 = []
 
-    # Recorremos la lista de areas visitadas en busqueda de iteraciones vacias
+    # Recorremos la lista de áreas visitadas en busqueda de iteraciones vacias
     for i in range(len(Lista_areas_descubiertas)):
         if Lista_areas_descubiertas[i] == None:
             Lista_Auxiliar_2.append(i)  # Almacenamos su posición en una lista extra
@@ -52,11 +53,25 @@ def sensor_mirar():
         for i in range(len(Lista_Auxiliar_2)):
             Lista_areas_descubiertas.pop(i)
             Lista_Auxiliar_2.pop()
-            i-= 1
+            i -= 1
 
-            if  (i + 1 == len(Lista_Auxiliar_2) or len(Lista_Auxiliar_2) == 0): break   # condición para romper ciclo
+            if i + 1 == len(Lista_Auxiliar_2) or len(Lista_Auxiliar_2) == 0: break   # condición para romper ciclo
 
-    return Lista_areas_descubiertas
+    Nueva_Lista = []  # Almacenamos en él la lista ordenada
+
+
+    # Algoritmo para ordenar la lista
+    for i in Orden:
+        for j in Lista_areas_descubiertas:
+            if i in j.direccion:
+                Nueva_Lista.append(j)
+
+
+    return Nueva_Lista
+
+
+
+
 
 
 # Devuelve un queue FIFO. Almacena las direcciones de las posibles ramificaciones a tomar bajo el criterio de prioridad
@@ -94,10 +109,12 @@ pos_x = 0
 pos_y = 9
 pos_x_inicio = pos_x
 pos_y_inicio = pos_y
-pos_x_final = 14
-pos_y_final = 1
+pos_x_final = 4
+pos_y_final = 6
 # x = 4, y = 6
 # x = 14, y = 1
+
+Orden = ['Derecha', 'Abajo', 'Arriba', 'Izquierda']  # Orden de prioridad
 
 # 0: Profundidad
 # 1: Anchura
@@ -159,6 +176,9 @@ Profundidad_inicial =  0                   # Almacena la profundidad del último
 Profundidades = []                         # Almacena las profundidades entre cada nodo padre
 Numero_ramificaciones_disponibles = []     # Almacena el número de nodos disponibles por recorrer
 
+
+
+
 # Inicialización del algoritmo
 if Algoritmo == 0:
     # algoritmo de profundidad
@@ -174,6 +194,24 @@ if Algoritmo == 0:
         # PASO 1. CREAR EL NODO RAÍZ. Solo ocurre en la primera iteración
         if ARBOL.Vacio():
 
+            # Dibujar el laberinto
+            dibujar_muneco()
+            for fila in range(len(matriz)):
+                for columna in range(len(matriz[0])):
+                    if not areas_descubiertas[fila][columna]:
+                        color = GRIS  # Si no se ha descubierto, pintar de gris
+
+                    else:
+                        color = BLANCO if matriz[fila][columna] == 1 else NEGRO
+
+                    pygame.draw.rect(ventana, color,
+                                     (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+                    if areas_visitadas[fila][columna]:
+                        letra_v_rect = letra_v.get_rect()
+                        letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
+                        ventana.blit(letra_v, letra_v_rect)
+            pygame.display.update()
+
             # Creamos un objeto nodo con posición inicial y sin dirección en el arbol
             Posicion_inicial = [pos_y, pos_x]
             ARBOL.Agregar_nodo_FIFO(Nodo(pos_y, pos_x))
@@ -185,7 +223,7 @@ if Algoritmo == 0:
             continue # Saltamos directamente a la siguiente iteración
 
         # PASO 2. ANÁLISIS DE LADOS DEL NODO. Conocemos las posiciones y direcciones de los elementos al rededor del punto
-        Areas_Visitadas = sensor_mirar()  # Adquirimos las áreas al rededor del punto
+        Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas al rededor del punto
         it = 0      # Cuenta el número de direcciones a recorrer en la Queue
 
         # PASO 3. FILTRAR LADOS. Registramos los datos de las áreas a las que podemos desplazarnos
@@ -242,9 +280,10 @@ if Algoritmo == 0:
                 else: Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
 
                 # Dado las direcciones de cada ramificación, generar nodo en el arbol
-                for i in Direcciones_por_agregar: ARBOL.Generar_nodos(i)
+                for i in Direcciones_por_agregar:
+                    ARBOL.Generar_nodos(i)
 
-                # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición
+                # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición -------------------POSIBLE SELECCION DE PRIORIDAD
                 Direccion = Ramificaciones_por_seguir.get()
                 ARBOL.Agregar_direccion(Direccion)
                 ARBOL.Agregar_posicion(Posicion_Actual)
@@ -320,8 +359,7 @@ if Algoritmo == 0:
                         Nodos_por_regresar = ARBOL.Numero_Nodos - Profundidad_inicial
                         pass
 
-        # De haber llegado a las coordenadas finales, finalizamos el programa
-        if pos_x == pos_x_final and pos_y == pos_y_final: ganado = True
+
         time.sleep(0.2)
 
         """
@@ -368,6 +406,28 @@ if Algoritmo == 0:
 
         pygame.display.update()
 
+        # De haber llegado a las coordenadas finales, finalizamos el programa
+        if pos_x == pos_x_final and pos_y == pos_y_final:
+            # Dibujar el laberinto
+            for fila in range(len(matriz)):
+                for columna in range(len(matriz[0])):
+                    if not areas_descubiertas[fila][columna]:
+                        color = GRIS  # Si no se ha descubierto, pintar de gris
+
+                    else:
+                        color = BLANCO if matriz[fila][columna] == 1 else NEGRO
+
+                    pygame.draw.rect(ventana, color,
+                                     (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+                    if areas_visitadas[fila][columna]:
+                        letra_v_rect = letra_v.get_rect()
+                        letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
+                        ventana.blit(letra_v, letra_v_rect)
+
+            dibujar_muneco()  # Dibujar el muñeco
+            #pygame.display.update()
+            ganado = True
+
         # En caso de haber llegado al punto final
         if ganado:
             mensaje = '¡Haz ganado!'
@@ -387,6 +447,8 @@ if Algoritmo == 0:
             pygame.quit()
             sys.exit()
 
+"""
+ Algoritmo de anchura
 else:
     # algoritmo de anchura
     while True:
@@ -410,7 +472,7 @@ else:
             continue  # Saltamos directamente a la siguiente iteración
 
         # PASO 2. ANÁLISIS DE LADOS DEL NODO. Conocemos las posiciones y direcciones de los elementos al rededor del punto
-        Areas_Visitadas = sensor_mirar()  # Adquirimos las áreas al rededor del punto
+        Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas al rededor del punto
         it = 0  # Cuenta el número de direcciones a recorrer en la Queue
 
         # PASO 3. FILTRAR LADOS. Registramos los datos de las áreas a las que podemos desplazarnos
@@ -474,10 +536,6 @@ else:
                 Direccion = Ramificaciones_por_seguir.get()
                 ARBOL.Agregar_direccion(Direccion)
                 ARBOL.Agregar_posicion(Posicion_Actual)
-
-
-
-
 
             # PASO 5. GENERAR RAMIFICACIONES
             # De no tener ninguna ramificación
@@ -555,12 +613,10 @@ else:
                         Nodos_por_regresar = ARBOL.Numero_Nodos - Profundidad_inicial
                         pass
 
-        # De haber llegado a las coordenadas finales, finalizamos el programa
-        if pos_x == pos_x_final and pos_y == pos_y_final: ganado = True
-        time.sleep(0.2)
 
-        """
-        AGENO A MI__________________________________________________________"""
+        time.sleep(5)
+
+
 
         # Dibujar el laberinto
         for fila in range(len(matriz)):
@@ -584,7 +640,7 @@ else:
         ventana.blit(texto, (10, 10))
         pygame.display.update()
 
-        dibujar_muneco()  # Dibujar el muñeco
+        #dibujar_muneco()  # Dibujar el muñeco
 
         if Direccion == "Arriba":  pos_y -= 1
         if Direccion == "Abajo":   pos_y += 1
@@ -606,6 +662,12 @@ else:
 
         pygame.display.update()
 
+        # De haber llegado a las coordenadas finales, finalizamos el programa
+        if pos_x == pos_x_final and pos_y == pos_y_final:
+            dibujar_muneco()  # Dibujar el muñeco
+            pygame.display.update()
+            ganado = True
+
         # En caso de haber llegado al punto final
         if ganado:
             mensaje = '¡Haz ganado!'
@@ -624,3 +686,4 @@ else:
             pygame.time.delay(3000)  # Espera 3 segundos
             pygame.quit()
             sys.exit()
+"""

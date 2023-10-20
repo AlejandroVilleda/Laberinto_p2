@@ -179,7 +179,7 @@ class Grafica:
         # Unimos los nuevos elementos al padre proveniente de una ramificación, generando otra ramificación
         if (len(self.Nodos) == 1 and It > 1) or (len(self.Nodos) == 1 and self.tree.size() > 1) and (len(self.Nodos_Ramificados) == 0): # CHECAR PQ NO ESTA BIEN________________________________
             for x in range(Grafica.i, len(self.Nodos)):
-                if (self.Padre != self.Nodos[x]): self.tree.add_edge(self.Padre, self.Nodos[x])
+                if self.Padre != self.Nodos[x]: self.tree.add_edge(self.Padre, self.Nodos[x])
 
         # Agregando los hijos de un nodo siemrpe que existan
         if len(Grafica.Nodos_Ramificados) != 0:
