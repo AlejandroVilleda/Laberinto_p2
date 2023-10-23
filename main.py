@@ -9,10 +9,12 @@ FUNCIONES PRINCIPALES___________________________________________________"""
 def dibujar_muneco(): ventana.blit(muneco_img, (pos_x * TAMANO_CUADRO, pos_y * TAMANO_CUADRO))
 
 # Devuelve una lista de objetos Nodos con las principales caracteristicas que necesitamos (posición y dirección)
-def sensor_mirar(Orden: list):
+def sensor_mirar(Orden: list):  # -----------------------------POSICION DEBE SER ACTUALIZADA CON CADA RAMA
+
+
     areas_descubiertas[pos_y][pos_x] = True  # Mostramos el área en el que nos encontramos
     Lista_areas_descubiertas = [None]        # Guardamos aquí una lista de las áreas descubiertas
-    Lista_Auxiliar = [None]                  # Almacena la posición de las áreas
+    Lista_Auxiliar: Nodo                 # Almacena la posición de las áreas
 
     # Revisamos el elemento de ARRIBA
     if pos_y - 1 >= 0:
@@ -109,8 +111,8 @@ pos_x = 0
 pos_y = 9
 pos_x_inicio = pos_x
 pos_y_inicio = pos_y
-pos_x_final = 4
-pos_y_final = 6
+pos_x_final = 14
+pos_y_final = 1
 # x = 4, y = 6
 # x = 14, y = 1
 
@@ -499,6 +501,7 @@ else:
         # PASO 2. ANÁLISIS DE LADOS DEL NODO. Conocemos las posiciones y direcciones de los elementos al rededor del punto
         # Comienzo
         if len(Ramificaciones_por_seguir) == 0:
+            Posicion_Actual = ARBOL
             Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas al rededor del punto
 
             # PASO 3. FILTRAR LADOS. Registramos los datos de las áreas a las que podemos desplazarnos
@@ -562,6 +565,8 @@ else:
                 ARBOL.Eliminar_direccion()
                 ARBOL.Agregar_ramificacion(Ramificacion)
                 Posicion_Actual = ARBOL.Coordenadas_nodo()
+                pos_y = Posicion_Actual[0]
+                pos_x = Posicion_Actual[1]
 
                 Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas al rededor del punto
 
