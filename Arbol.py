@@ -112,7 +112,7 @@ class Arbol:
     def Agregar_direccion(self, direccion): self.Direcciones_generadas.append(direccion)
 
     # Agregamos una ramificación particular
-    def Agregar_ramificacion(self, Direccion): self.Direcciones_generadas = Direccion
+    def Agregar_ramificacion(self, Direccion: list): Arbol.Direcciones_generadas = Direccion.copy()
 
     # Eliminamos la últma ruta que debe seguir el arbol
     def Eliminar_direccion_nodo(self): self.Direcciones_generadas.pop()

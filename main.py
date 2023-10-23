@@ -171,7 +171,7 @@ EJECUCIÓN DEL CÓDIGO____________________________________________________"""
 ARBOL = Arbol()
 Arbol_generado = Grafica()
 
-Ramificaciones_por_seguir = queue.Queue()  # Almacena la dirección de las ramificaciones a seguir bajo el criterio de prioridad
+
 Profundidad_inicial =  0                   # Almacena la profundidad del último nodo padre recorrido
 Profundidades = []                         # Almacena las profundidades entre cada nodo padre
 Numero_ramificaciones_disponibles = []     # Almacena el número de nodos disponibles por recorrer
@@ -181,6 +181,9 @@ Numero_ramificaciones_disponibles = []     # Almacena el número de nodos dispon
 
 # Inicialización del algoritmo
 if Algoritmo == 0:
+
+    Ramificaciones_por_seguir = queue.Queue()  # Almacena la dirección de las ramificaciones a seguir bajo el criterio de prioridad
+
     # algoritmo de profundidad
     while True:
 
@@ -546,7 +549,14 @@ else:
                     ARBOL.Agregar_posicion(Posicion_Actual)
 
         else:
+            Saltar = 0
+            # __________________--------------------------- IMPLEMENTAR ARREGLO DE POSICIONES POR CADA DIRECCIÓN DE UN NUEVO ARREGLO DE DIRECCIONES
             for Ramificacion in Ramificaciones_por_seguir:
+
+                # Brincamos una iteración en las ramificaciones para respetar el orden de generación de ramificacion
+                if Saltar != 0:
+                    Saltar -= 1
+                    continue
 
                 # Agregamos el conjunto de direcciones actuales
                 ARBOL.Eliminar_direccion()
@@ -604,6 +614,47 @@ else:
                         ARBOL.Agregar_direccion(Direccion)
                         ARBOL.Agregar_posicion(Posicion_Actual)
 
+                    else:
+
+
+
+                        # Coleccionamos en una queue los nodos por agregar
+                        for i in Nodos_por_agregar:
+                            ARBOL.Agregar_nodo_FIFO(i)
+
+                        #for i in Nodos_por_agregar:
+                        #   ARBOL.Agregar_nodo_FIFO(i)
+
+                            # Agregamos en la gráfica el valor de los nodos
+                            # if len(Nodos_por_agregar) == 1:
+                            #   Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+                            # else:
+                            #   Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
+
+                        #else:
+                            # Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
+                        #    pass
+
+                        # Dado las direcciones de cada ramificación, generar nodo en el arbol
+                        #for i in Direcciones_por_agregar:
+                        #    ARBOL.Generar_nodos(i)
+
+                        # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición -------------------POSIBLE SELECCION DE PRIORIDAD
+                        #Ramificaciones_por_seguir.append(Direcciones_por_agregar)
+
+                        Ramificaciones_por_seguir.remove(Ramificacion)
+                        for Nodo in Nodos_por_agregar:
+                            Ramificacion_aux = Ramificacion.copy()
+                            Ramificacion_aux.append(Nodo.direccion)
+                            Ramificaciones_por_seguir.append(Ramificacion_aux)
+                            ARBOL.Generar_nodos(Nodo.direccion)
+
+                        #Ramificacion.append(Direcciones_por_agregar[0])
+                        Saltar = len(Nodos_por_agregar) - 1
+
+                        ARBOL.Agregar_direccion(Direccion)
+                        ARBOL.Agregar_posicion(Posicion_Actual)
+                        pass
                 pass
 
         time.sleep(0.2)
