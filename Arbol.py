@@ -111,8 +111,14 @@ class Arbol:
     # Agregamos la dirección o ruta que debe seguir el arbol para ingresar el nodo
     def Agregar_direccion(self, direccion): self.Direcciones_generadas.append(direccion)
 
+    # Agregamos una ramificación particular
+    def Agregar_ramificacion(self, Direccion): self.Direcciones_generadas = Direccion
+
     # Eliminamos la últma ruta que debe seguir el arbol
     def Eliminar_direccion_nodo(self): self.Direcciones_generadas.pop()
+
+    # Eliminamos la ramificación en su totalidad
+    def Eliminar_direccion(self): self.Direcciones_generadas.clear()
 
     # Contamos el número de hojas en toda la ramificación del arbol
     @property
