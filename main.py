@@ -791,8 +791,7 @@ else:
                     else:
                         color = BLANCO if matriz[fila][columna] == 1 else NEGRO
 
-                    pygame.draw.rect(ventana, color,
-                                     (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+                    pygame.draw.rect(ventana, color,(columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
                     if areas_visitadas[fila][columna]:
                         letra_v_rect = letra_v.get_rect()
                         letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
