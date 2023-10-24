@@ -24,6 +24,7 @@ class Nodo:
         self.Abajo = Abajo
         self.Derecha = Derecha
         self.Izquierda = Izquierda
+
         return Nodo(Posicion_y, Posicion_x, Direccion)
 
     @property  # Dirección que toma el nood
