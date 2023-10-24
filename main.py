@@ -776,8 +776,7 @@ else:
 
         inicio_f = f'F'
         ini_f = fuente.render(inicio_f, True, NEGRO)
-        ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO,
-                             pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
+        ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO, pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
 
         pygame.display.update()
 
