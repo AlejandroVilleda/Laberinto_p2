@@ -154,7 +154,6 @@ class Arbol:
 
 
 class Grafica:
-
     # Nodos recorridos y por graficar
     Nodos = []
     Nodos_Ramificados = []
