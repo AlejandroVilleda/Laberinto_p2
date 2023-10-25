@@ -72,8 +72,7 @@ def sensor_mirar(Orden: list):  # -----------------------------POSICION DEBE SER
                 if i in j.direccion:
                     Nueva_Lista.append(j)
 
-    else:
-        Nueva_Lista = Lista_areas_descubiertas.copy()
+    else: Nueva_Lista = Lista_areas_descubiertas.copy()
 
     return Nueva_Lista
 
@@ -93,34 +92,6 @@ def Agregar_elemento_Priorityqueue(Dato, Queue_vieja: queue, Posicion: int):
         for i in range(Queue_vieja.qsize()): Nueva_Queue.put(Queue_vieja.get())
 
     return Nueva_Queue
-
-def Agregar_ramificacion_Priorityqueue(Camino, Rama: list, Posicion: int):
-    Nueva_rama: list = []
-
-    # Algoritmo de insersión de datos de una FIFO QUEUE en una posición N
-    if Posicion == 0:
-        Nueva_rama.append(Camino)
-        Valor: list = Rama[0]
-        Rama.pop(0)
-        for i in range(len(Rama)): Nueva_rama.append(Valor)
-        Valor.pop(0)
-
-    else:
-
-        for i in range(Posicion):
-            Valor: list = Rama[0]
-            Rama.pop(0)
-            Nueva_rama.append(Valor)
-            Valor.pop(0)
-
-        Nueva_rama.append(Camino)
-        for i in range(len(Rama)):
-            Valor: list = Rama[0]
-            Rama.pop(0)
-            Nueva_rama.append(Valor)
-            Valor.pop()
-
-    return Nueva_rama
 
 
 """
@@ -281,8 +252,7 @@ if Algoritmo == 0:
                         it += 1
 
                     else:
-                        Ramificaciones_por_seguir = Agregar_elemento_Priorityqueue(Direccion, Ramificaciones_por_seguir,
-                                                                                   it)
+                        Ramificaciones_por_seguir = Agregar_elemento_Priorityqueue(Direccion, Ramificaciones_por_seguir, it)
                         it += 1
 
         # PASO 4. INSERTAR DATOS AL ÁRBOL
@@ -491,6 +461,8 @@ if Algoritmo == 0:
 else:
 
     Ramificaciones_por_seguir = []  # Lista que almacena un conjunto de direcciones por seguir
+    Ramificaciones_bloqueadas = []   # Lista que almacena las posiciones de direcciones bloqueadas
+    Ramificacion_bloquear = []  # Valor de la dirección a bloquear
 
     # algoritmo de anchura
     while True:
@@ -506,21 +478,34 @@ else:
         if ARBOL.Vacio():
 
             # Dibujar el laberinto
-            dibujar_muneco()
             for fila in range(len(matriz)):
                 for columna in range(len(matriz[0])):
                     if not areas_descubiertas[fila][columna]:
                         color = GRIS  # Si no se ha descubierto, pintar de gris
 
-                    else:
-                        color = BLANCO if matriz[fila][columna] == 1 else NEGRO
+                    else: color = BLANCO if matriz[fila][columna] == 1 else NEGRO
 
-                    pygame.draw.rect(ventana, color,
-                                     (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+                    pygame.draw.rect(ventana, color, (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
                     if areas_visitadas[fila][columna]:
                         letra_v_rect = letra_v.get_rect()
                         letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
                         ventana.blit(letra_v, letra_v_rect)
+
+            # Coordenadas de inicio.
+            inicio_i = f'In'
+            ini_i = fuente.render(inicio_i, True, NEGRO)
+            ventana.blit(ini_i, (pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
+
+            inicio_f = f'F'
+            ini_f = fuente.render(inicio_f, True, NEGRO)
+            ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO,pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
+
+            # Mostrar coordenadas generales en la ventana
+            coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
+            texto = fuente.render(coordenadas, True, BLANCO)
+            ventana.blit(texto, (10, 10))
+
+            dibujar_muneco()
             pygame.display.update()
 
             # Creamos un objeto nodo con posición inicial y sin dirección en el arbol
@@ -535,8 +520,39 @@ else:
 
         # PASO 2. ANÁLISIS DE LADOS DEL NODO. Conocemos las posiciones y direcciones de los elementos al rededor del punto
         # Comienzo
+
         if len(Ramificaciones_por_seguir) == 0:
             Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas al rededor del punto
+
+            # Dibujar el laberinto
+            for fila in range(len(matriz)):
+                for columna in range(len(matriz[0])):
+                    if not areas_descubiertas[fila][columna]: color = GRIS  # Si no se ha descubierto, pintar de gris
+                    else: color = BLANCO if matriz[fila][columna] == 1 else NEGRO
+
+                    pygame.draw.rect(ventana, color, (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+
+                    if areas_visitadas[fila][columna]:
+                        letra_v_rect = letra_v.get_rect()
+                        letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
+                        ventana.blit(letra_v, letra_v_rect)
+
+            # Coordenadas de inicio.
+            inicio_i = f'In'
+            ini_i = fuente.render(inicio_i, True, NEGRO)
+            ventana.blit(ini_i, (pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
+
+            inicio_f = f'F'
+            ini_f = fuente.render(inicio_f, True, NEGRO)
+            ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO, pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
+
+            # Mostrar coordenadas generales en la ventana
+            coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
+            texto = fuente.render(coordenadas, True, BLANCO)
+            ventana.blit(texto, (10, 10))
+
+            dibujar_muneco()
+            pygame.display.update()
 
             # PASO 3. FILTRAR LADOS. Registramos los datos de las áreas a las que podemos desplazarnos
             # Iteramos cada lado visitado
@@ -581,6 +597,11 @@ else:
                     # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición -------------------POSIBLE SELECCION DE PRIORIDAD
                     Ramificaciones_por_seguir.append(Direcciones_por_agregar)
 
+                    # En caso de haber más de una ramificación, almacenamos las posiciones a bloquear
+                    if len(Ramificaciones_por_seguir) > 1:
+                        for posiciones in Ramificaciones_por_seguir:
+                            Ramificaciones_bloqueadas.append(Ramificaciones_por_seguir.index(posiciones))
+
                     ARBOL.Agregar_direccion(Direccion)
                     ARBOL.Agregar_posicion(Posicion_Actual)
 
@@ -592,23 +613,55 @@ else:
         else:
             Saltar = 0
             Direccion_agregado = None
-            # __________________--------------------------- IMPLEMENTAR ARREGLO DE POSICIONES POR CADA DIRECCIÓN DE UN NUEVO ARREGLO DE DIRECCIONES
+
+            # Iteración por cada elemento de lista de direcciones
             for pos in range(len(Ramificaciones_por_seguir)):
 
                 # Brincamos una iteración en las ramificaciones para respetar el orden de generación de ramificacion
-                if Saltar != 0:
-                    #Saltar -= 1
-                    pos = pos + Saltar
-                    #continue
+                if Saltar != 0: pos = pos + Saltar
+
+                # Omitimos los elementos contenidos
+                if (pos in Ramificaciones_bloqueadas) is True: continue
 
                 # Agregamos el conjunto de direcciones actuales
                 ARBOL.Eliminar_direccion()
                 ARBOL.Agregar_ramificacion(Ramificaciones_por_seguir[pos])
-                Posicion_Actual = ARBOL.Coordenadas_nodo()  # --------------------------------QUITAR
+                Posicion_Actual = ARBOL.Coordenadas_nodo()
                 pos_y = Posicion_Actual[0]
                 pos_x = Posicion_Actual[1]
 
-                Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas al rededor del punto
+                Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas alrededor del punto
+
+                # Dibujar el laberinto
+                for fila in range(len(matriz)):
+                    for columna in range(len(matriz[0])):
+                        if not areas_descubiertas[fila][columna]:
+                            color = GRIS  # Si no se ha descubierto, pintar de gris
+
+                        else: color = BLANCO if matriz[fila][columna] == 1 else NEGRO
+
+                        pygame.draw.rect(ventana, color, (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+                        if areas_visitadas[fila][columna]:
+                            letra_v_rect = letra_v.get_rect()
+                            letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
+                            ventana.blit(letra_v, letra_v_rect)
+
+                # Coordenadas de inicio.
+                inicio_i = f'In'
+                ini_i = fuente.render(inicio_i, True, NEGRO)
+                ventana.blit(ini_i, (pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
+
+                inicio_f = f'F'
+                ini_f = fuente.render(inicio_f, True, NEGRO)
+                ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO,pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
+
+                # Mostrar coordenadas generales en la ventana
+                coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
+                texto = fuente.render(coordenadas, True, BLANCO)
+                ventana.blit(texto, (10, 10))
+
+                dibujar_muneco()
+                pygame.display.update()
 
                 # PASO 3. FILTRAR LADOS. Registramos los datos de las áreas a las que podemos desplazarnos
                 # Iteramos cada lado visitado
@@ -617,6 +670,7 @@ else:
                     # Si el área visitado es blanco y no lo hemos recorrido antes, registramos su posición y dirección
                     if matriz[Areas_Visitadas[i].Posicion_y][Areas_Visitadas[i].Posicion_x] == 1:
                         if (Areas_Visitadas[i].Posicion_actual in ARBOL.Nodos_visitados) is False:
+
                             # Almacenamos el nodo iterado y lo almacenamos para agregar al arbol
                             Nuevo_nodo = Nodo(Areas_Visitadas[i].Posicion_Y, Areas_Visitadas[i].Posicion_X, Areas_Visitadas[i].direccion)
                             Nodos_por_agregar.append(Nuevo_nodo)
@@ -633,8 +687,7 @@ else:
                     if len(Nodos_por_agregar) == 1:
 
                         # Coleccionamos en una queue los nodos por agregar
-                        for i in Nodos_por_agregar:
-                            ARBOL.Agregar_nodo_FIFO(i)
+                        for i in Nodos_por_agregar: ARBOL.Agregar_nodo_FIFO(i)
 
                             # Agregamos en la gráfica el valor de los nodos
                             # if len(Nodos_por_agregar) == 1:
@@ -642,10 +695,8 @@ else:
                             # else:
                             #   Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
 
-                        else:
-                            Nodos_por_agregar.clear()
+                        else:Nodos_por_agregar.clear()
                             # Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
-                            pass
 
                         # Dado las direcciones de cada ramificación, generar nodo en el arbol
                         for i in Direcciones_por_agregar:
@@ -654,8 +705,7 @@ else:
 
                         else: Direcciones_por_agregar.clear()
 
-                        # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición -------------------POSIBLE SELECCION DE PRIORIDAD
-                        # Ramificaciones_por_seguir.append(Direcciones_por_agregar)
+                        # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición
                         Ramificaciones_por_seguir[pos].append(Direccion_agregado)
 
                         ARBOL.Agregar_direccion(Direccion)
@@ -672,9 +722,6 @@ else:
                         for i in Nodos_por_agregar:
                             ARBOL.Agregar_nodo_FIFO(i)
 
-                        # for i in Nodos_por_agregar:
-                        #   ARBOL.Agregar_nodo_FIFO(i)
-
                         # Agregamos en la gráfica el valor de los nodos
                         # if len(Nodos_por_agregar) == 1:
                         #   Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
@@ -686,49 +733,50 @@ else:
                         #    pass
 
                         # Dado las direcciones de cada ramificación, generar nodo en el arbol
-                        # for i in Direcciones_por_agregar:
-                        #    ARBOL.Generar_nodos(i)
-
-                        # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición -------------------POSIBLE SELECCION DE PRIORIDAD
-                        # Ramificaciones_por_seguir.append(Direcciones_por_agregar)
-                        # ----------------------------------------------------------------ESTABLECER ORDEN AL REESCRIBIR LAS DIRECCIONES AL DUPLICAR
-                        """it = Ramificaciones_por_seguir.index(Ramificacion)
-                        Ramificaciones_por_seguir.remove(Ramificacion)
-                        for u in range(it + 1):
-                            print("Vagina")
-                            pass
-                        """
-                        """Ramificaciones_por_seguir.remove(Ramificacion)
-                        for nodo in Nodos_por_agregar:
-                            Ramificacion_aux = Ramificacion.copy()
-                            Ramificacion_aux.append(nodo.direccion)
-                            Ramificaciones_por_seguir.append(Ramificacion_aux)
-                            ARBOL.Generar_nodos(nodo.direccion)"""
-
                         # Algoritmo para eliminar e ingresar elementos en posiciones particulares con listas
                         it = Ramificaciones_por_seguir.index(Ramificaciones_por_seguir[pos])
                         Ramificacion_piv = Ramificaciones_por_seguir[pos]
+                        Numero_ramificacion_anterior = len(Ramificaciones_por_seguir)
                         Ramificaciones_por_seguir.remove(Ramificaciones_por_seguir[pos])
                         Nuevas_ramificaciones_por_seguir = []
+
+
                         for a in range(it):
                             Nuevas_ramificaciones_por_seguir.append(Ramificaciones_por_seguir[a])
 
                         for nodo in Nodos_por_agregar:
                             Ramificacion_aux = Ramificacion_piv.copy()
                             Ramificacion_aux.append(nodo.direccion)
+                            if (Numero_ramificacion_anterior) != 1: #or (len(Ramificaciones_por_seguir) - Numero_ramificacion_anterior + 1) != 0:
+                                Ramificacion_bloquear.append(Ramificacion_aux)
+                            #else: pass
                             Nuevas_ramificaciones_por_seguir.append(Ramificacion_aux)
                             ARBOL.Generar_nodos(nodo.direccion)
+
+
+
 
                         for a in range(it, len(Ramificaciones_por_seguir)):
                             Nuevas_ramificaciones_por_seguir.append(Ramificaciones_por_seguir[a])
 
                         Ramificaciones_por_seguir = Nuevas_ramificaciones_por_seguir.copy()
-                        #__________________________________________________
 
-                        # Ramificacion.append(Direcciones_por_agregar[0])
-                        Saltar = len(Nodos_por_agregar) - 1
 
-                        ARBOL.Agregar_direccion(Direccion)
+
+                        Saltar = Saltar + len(Nodos_por_agregar) - 1
+
+
+                        # solo cuando tengamos más de una ramificación
+                        if Numero_ramificacion_anterior != 1:
+
+                            Ramificaciones_bloqueadas.clear() # Limpiamos para actualizar las posiciones
+
+                            # Buscando las posiciones en las que se encuentran los nodos nuevos para bloquearlos
+                            for Ramificacion in Ramificaciones_por_seguir:
+                                if (Ramificacion in Ramificacion_bloquear) is True:
+                                    Ramificaciones_bloqueadas.append(Ramificaciones_por_seguir.index(Ramificacion))
+
+                        ARBOL.Agregar_direccion(Direccion) if len(Nodos_por_agregar) != 0 else None
                         ARBOL.Agregar_posicion(Posicion_Actual)
 
                         # Actualizando posicion ----------------------------------QUITAR
@@ -737,59 +785,28 @@ else:
                         pos_x = Posicion_Actual[1]
                         Nodos_por_agregar.clear()
                         Direcciones_por_agregar.clear()
-                        pass
-                pass
 
-        time.sleep(0.5)
+            else:
+                if len(Ramificaciones_bloqueadas) == len(Ramificaciones_por_seguir):
+                    Ramificaciones_bloqueadas.clear()
+                    Ramificacion_bloquear.clear()
+        time.sleep(2)
 
-        """
-        AGENO A MI__________________________________________________________"""
 
-        # Dibujar el laberinto
-        for fila in range(len(matriz)):
-            for columna in range(len(matriz[0])):
-                if not areas_descubiertas[fila][columna]:
-                    color = GRIS  # Si no se ha descubierto, pintar de gris
 
-                else:
-                    color = BLANCO if matriz[fila][columna] == 1 else NEGRO
-
-                pygame.draw.rect(ventana, color, (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
-                if areas_visitadas[fila][columna]:
-                    letra_v_rect = letra_v.get_rect()
-                    letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
-                    ventana.blit(letra_v, letra_v_rect)
-
-        # Mostrar coordenadas generales en la ventana
-        coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
-        texto = fuente.render(coordenadas, True, BLANCO)
-        ventana.blit(texto, (10, 10))
-        pygame.display.update()
-
-        dibujar_muneco()  # Dibujar el muñeco
+        #dibujar_muneco()  # Dibujar el muñeco
         # Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
-
-        # Coordenadas de inicio.
-        inicio_i = f'In'
-        ini_i = fuente.render(inicio_i, True, NEGRO)
-        ventana.blit(ini_i, (pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
-
-        inicio_f = f'F'
-        ini_f = fuente.render(inicio_f, True, NEGRO)
-        ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO, pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
-
-        pygame.display.update()
 
         # De haber llegado a las coordenadas finales, finalizamos el programa
         if pos_x == pos_x_final and pos_y == pos_y_final:
+
             # Dibujar el laberinto
             for fila in range(len(matriz)):
                 for columna in range(len(matriz[0])):
                     if not areas_descubiertas[fila][columna]:
                         color = GRIS  # Si no se ha descubierto, pintar de gris
 
-                    else:
-                        color = BLANCO if matriz[fila][columna] == 1 else NEGRO
+                    else:color = BLANCO if matriz[fila][columna] == 1 else NEGRO
 
                     pygame.draw.rect(ventana, color,(columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
                     if areas_visitadas[fila][columna]:
@@ -797,8 +814,22 @@ else:
                         letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
                         ventana.blit(letra_v, letra_v_rect)
 
+            # Coordenadas de inicio.
+            inicio_i = f'In'
+            ini_i = fuente.render(inicio_i, True, NEGRO)
+            ventana.blit(ini_i, ( pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
+
+            inicio_f = f'F'
+            ini_f = fuente.render(inicio_f, True, NEGRO)
+            ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO,pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
+
+            # Mostrar coordenadas generales en la ventana
+            coordenadas = f'Coordenadas: ({pos_x}, {pos_y})'
+            texto = fuente.render(coordenadas, True, BLANCO)
+            ventana.blit(texto, (10, 10))
+
             dibujar_muneco()  # Dibujar el muñeco
-            # pygame.display.update()
+            pygame.display.update()
             ganado = True
 
         # En caso de haber llegado al punto final
@@ -806,13 +837,7 @@ else:
             mensaje = '¡Haz ganado!'
             fuente_ganado = pygame.font.Font(None, 36)
             mensaje_renderizado = fuente_ganado.render(mensaje, True, BLANCO)
-            ventana.blit \
-                (mensaje_renderizado,
-                 (
-                     ANCHO // 2 - mensaje_renderizado.get_width() // 2,
-                     ALTO // 2 - mensaje_renderizado.get_height() // 2
-                 )
-                 )
+            ventana.blit(mensaje_renderizado, (ANCHO // 2 - mensaje_renderizado.get_width() // 2,ALTO // 2 - mensaje_renderizado.get_height() // 2 ))
 
             pygame.display.update()
             Arbol_generado.Graficar()
