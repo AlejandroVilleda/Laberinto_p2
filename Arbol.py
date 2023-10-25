@@ -215,6 +215,10 @@ class Grafica:
     def Agregar_Padre(self, Posicion):
         self.Padre = Posicion
 
+    # Devuelve el valor del padre
+    @property
+    def Valor_padre(self): return self.Padre
+
     # Forzamos un reseteo de datos en caso de saltos en el arbol
     def Resetear(self):
         self.Nodos.clear()

@@ -171,7 +171,6 @@ EJECUCIÓN DEL CÓDIGO____________________________________________________"""
 
 # Creamos el arbol de desición con un nodo inicial y la gráfica del arbol
 ARBOL = Arbol()
-Arbol_generado = Grafica()
 Bodo = Nodo(5, 3, 'Arriba')
 
 Profundidad_inicial = 0  # Almacena la profundidad del último nodo padre recorrido
@@ -180,7 +179,7 @@ Numero_ramificaciones_disponibles = []  # Almacena el número de nodos disponibl
 
 # Inicialización del algoritmo
 if Algoritmo == 0:
-
+    Arbol_generado = Grafica() # Creamos la gráfica del arbol
     Ramificaciones_por_seguir = queue.Queue()  # Almacena la dirección de las ramificaciones a seguir bajo el criterio de prioridad
 
     # algoritmo de profundidad
@@ -459,11 +458,11 @@ if Algoritmo == 0:
 
 # Para el algoritmo de anchura
 else:
-
+    Arbol_generado = Grafica() # Creamos la gráfica del arbol
     Ramificaciones_por_seguir = []  # Lista que almacena un conjunto de direcciones por seguir
     Ramificaciones_bloqueadas = []   # Lista que almacena las posiciones de direcciones bloqueadas
     Ramificacion_bloquear = []  # Valor de la dirección a bloquear
-
+    Vacio = None
     # algoritmo de anchura
     while True:
 
@@ -514,13 +513,12 @@ else:
             ARBOL.Generar_nodos(None)
 
             # Agregamos la posición inicial al arbol de graficación
-            # Arbol_generado.Agregar_nodo(str(Posicion_inicial))
-            # Arbol_generado.Generar_Nodos()
+            Arbol_generado.Agregar_nodo(str(Posicion_inicial))
+            Arbol_generado.Generar_Nodos()
             continue  # Saltamos directamente a la siguiente iteración
 
         # PASO 2. ANÁLISIS DE LADOS DEL NODO. Conocemos las posiciones y direcciones de los elementos al rededor del punto
         # Comienzo
-
         if len(Ramificaciones_por_seguir) == 0:
             Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas al rededor del punto
 
@@ -581,13 +579,13 @@ else:
                         ARBOL.Agregar_nodo_FIFO(i)
 
                         # Agregamos en la gráfica el valor de los nodos
-                        # if len(Nodos_por_agregar) == 1:
-                        #   Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
-                        # else:
-                        #   Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
+                        if len(Nodos_por_agregar) == 1:
+                            Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+                        else:
+                           Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
 
                     else:
-                        # Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
+                        Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
                         pass
 
                     # Dado las direcciones de cada ramificación, generar nodo en el arbol
@@ -610,12 +608,14 @@ else:
                     pos_y = Posicion_Actual[0]
                     pos_x = Posicion_Actual[1]
 
+        # Cuando ya existan elementos dentro de la ramificacion
         else:
             Saltar = 0
             Direccion_agregado = None
 
             # Iteración por cada elemento de lista de direcciones
             for pos in range(len(Ramificaciones_por_seguir)):
+                Vacio = False
 
                 # Brincamos una iteración en las ramificaciones para respetar el orden de generación de ramificacion
                 if Saltar != 0: pos = pos + Saltar
@@ -629,6 +629,7 @@ else:
                 Posicion_Actual = ARBOL.Coordenadas_nodo()
                 pos_y = Posicion_Actual[0]
                 pos_x = Posicion_Actual[1]
+                Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))  # almacenamos al nuevo padre a graficar
 
                 Areas_Visitadas = sensor_mirar(Orden)  # Adquirimos las áreas alrededor del punto
 
@@ -687,16 +688,16 @@ else:
                     if len(Nodos_por_agregar) == 1:
 
                         # Coleccionamos en una queue los nodos por agregar
-                        for i in Nodos_por_agregar: ARBOL.Agregar_nodo_FIFO(i)
+                        for i in Nodos_por_agregar:
+                            ARBOL.Agregar_nodo_FIFO(i) # Agregamos en la gráfica el valor de los nodos
+                            if len(Nodos_por_agregar) == 1:
+                                Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+                            else:
+                               Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
 
-                            # Agregamos en la gráfica el valor de los nodos
-                            # if len(Nodos_por_agregar) == 1:
-                            #   Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
-                            # else:
-                            #   Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
-
-                        else:Nodos_por_agregar.clear()
-                            # Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
+                        else:
+                            Nodos_por_agregar.clear()
+                            Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
 
                         # Dado las direcciones de cada ramificación, generar nodo en el arbol
                         for i in Direcciones_por_agregar:
@@ -715,22 +716,25 @@ else:
                         Posicion_Actual = ARBOL.Coordenadas_nodo()
                         pos_y = Posicion_Actual[0]
                         pos_x = Posicion_Actual[1]
-
+                        #Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))  # almacenamos al nuevo padre a graficar
+                        Arbol_generado.Resetear()  # Forzamos a un reseteo debido a un cambio de ramificación
+                        # -----------------AGREGAR PADRE CON VALOR DEL ÚLTIMO NODO
+                    # Cuando exista más de un hijo por agregar
                     else:
+                        Arbol_generado.Agregar_nodo(str(Posicion_Actual))
 
                         # Coleccionamos en una queue los nodos por agregar
                         for i in Nodos_por_agregar:
                             ARBOL.Agregar_nodo_FIFO(i)
 
-                        # Agregamos en la gráfica el valor de los nodos
-                        # if len(Nodos_por_agregar) == 1:
-                        #   Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
-                        # else:
-                        #   Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
+                            # Agregamos en la gráfica el valor de los nodos
+                            if len(Nodos_por_agregar) == 1:
+                                Arbol_generado.Agregar_nodo(str(i.Posicion_actual))
+                            else:
+                                Arbol_generado.Agregar_ramificacion(str(i.Posicion_actual))
 
-                        # else:
-                        # Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
-                        #    pass
+                        else:
+                            Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
 
                         # Dado las direcciones de cada ramificación, generar nodo en el arbol
                         # Algoritmo para eliminar e ingresar elementos en posiciones particulares con listas
@@ -776,21 +780,27 @@ else:
                                 if (Ramificacion in Ramificacion_bloquear) is True:
                                     Ramificaciones_bloqueadas.append(Ramificaciones_por_seguir.index(Ramificacion))
 
-                        ARBOL.Agregar_direccion(Direccion) if len(Nodos_por_agregar) != 0 else None
+                        ARBOL.Agregar_direccion(Direccion) if len(Nodos_por_agregar) != 0 else None#-----------------INVERTIR 0
                         ARBOL.Agregar_posicion(Posicion_Actual)
 
                         # Actualizando posicion ----------------------------------QUITAR
                         Posicion_Actual = ARBOL.Coordenadas_nodo()
                         pos_y = Posicion_Actual[0]
                         pos_x = Posicion_Actual[1]
+                        if Nodos_por_agregar == 0: Arbol_generado.Agregar_Padre(str(Posicion_Actual))
+                        if len(Nodos_por_agregar) == 0: Vacio = True
                         Nodos_por_agregar.clear()
                         Direcciones_por_agregar.clear()
 
             else:
+                Arbol_generado.Resetear()
+                Arbol_generado.Agregar_nodo(Arbol_generado.Valor_padre) if Vacio == True else None
+
                 if len(Ramificaciones_bloqueadas) == len(Ramificaciones_por_seguir):
                     Ramificaciones_bloqueadas.clear()
                     Ramificacion_bloquear.clear()
-        time.sleep(2)
+        time.sleep(0.2)
+        # ----------------------------- REVISAR LA POSICION 6,6 EN EL DEBUG
 
 
 
