@@ -112,16 +112,33 @@ pos_x = 0
 pos_y = 9
 pos_x_inicio = pos_x
 pos_y_inicio = pos_y
-pos_x_final = 4
-pos_y_final = 6
-# x = 4, y = 6
+pos_x_final = 14
+pos_y_final = 1
+# x = 6, y = 6
 # x = 14, y = 1
 
-Orden = ['Arriba', 'Abajo', 'Derecha', 'Izquierda']  # Orden de prioridad
+# Orden de prioridad
+Orden = [
+    'Arriba',
+    'Abajo',
+    'Derecha',
+    'Izquierda'
+    ]
 
 # 0: Profundidad
 # 1: Anchura
 Algoritmo = 1
+"""
+print("PRACTICA 2". center(20, '-'))
+print("0. Profundidad")
+print("1. Anchura")
+Algoritmo = None
+while(Algoritmo != 1 and Algoritmo != 0):
+
+    Algoritmo = int(input("respuesta: "))
+    if Algoritmo != 1 and Algoritmo != 0:
+        print("\nOpcion no sperada")
+"""
 
 """
 GENERAR MATRIZ__________________________________________________________"""
@@ -380,8 +397,7 @@ if Algoritmo == 0:
                 else:
                     color = BLANCO if matriz[fila][columna] == 1 else NEGRO
 
-                pygame.draw.rect(ventana, color,
-                                 (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+                pygame.draw.rect(ventana, color,(columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
                 if areas_visitadas[fila][columna]:
                     letra_v_rect = letra_v.get_rect()
                     letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
@@ -404,14 +420,11 @@ if Algoritmo == 0:
         # Coordenadas de inicio.
         inicio_i = f'In'
         ini_i = fuente.render(inicio_i, True, NEGRO)
-        ventana.blit(ini_i, (
-        pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
+        ventana.blit(ini_i, ( pos_x_inicio, pos_y_inicio * TAMANO_CUADRO))  # Coordenadas (0, 9) multiplicadas por el tamaño de cuadro
 
         inicio_f = f'F'
         ini_f = fuente.render(inicio_f, True, NEGRO)
-        ventana.blit(ini_f,
-                     (pos_x_final * TAMANO_CUADRO,
-                      pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
+        ventana.blit(ini_f, (pos_x_final * TAMANO_CUADRO,pos_y_final * TAMANO_CUADRO))  # Coordenadas (14, 1) multiplicadas por el tamaño de cuadro
 
         pygame.display.update()
 
@@ -423,18 +436,15 @@ if Algoritmo == 0:
                     if not areas_descubiertas[fila][columna]:
                         color = GRIS  # Si no se ha descubierto, pintar de gris
 
-                    else:
-                        color = BLANCO if matriz[fila][columna] == 1 else NEGRO
+                    else: color = BLANCO if matriz[fila][columna] == 1 else NEGRO
 
-                    pygame.draw.rect(ventana, color,
-                                     (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
+                    pygame.draw.rect(ventana, color, (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO, TAMANO_CUADRO, TAMANO_CUADRO))
                     if areas_visitadas[fila][columna]:
                         letra_v_rect = letra_v.get_rect()
                         letra_v_rect.topleft = (columna * TAMANO_CUADRO, fila * TAMANO_CUADRO)
                         ventana.blit(letra_v, letra_v_rect)
 
             dibujar_muneco()  # Dibujar el muñeco
-            # pygame.display.update()
             ganado = True
 
         # En caso de haber llegado al punto final
@@ -442,15 +452,15 @@ if Algoritmo == 0:
             mensaje = '¡Haz ganado!'
             fuente_ganado = pygame.font.Font(None, 36)
             mensaje_renderizado = fuente_ganado.render(mensaje, True, BLANCO)
-            ventana.blit \
-                (mensaje_renderizado,
-                 (
-                     ANCHO // 2 - mensaje_renderizado.get_width() // 2,
-                     ALTO // 2 - mensaje_renderizado.get_height() // 2
-                 )
-                 )
-
+            ventana.blit(mensaje_renderizado,(ANCHO // 2 - mensaje_renderizado.get_width() // 2,ALTO // 2 - mensaje_renderizado.get_height() // 2))
             pygame.display.update()
+
+            Posiciones_graficar = []
+            print("NULL ->\t" + str([pos_y_inicio, pos_x_inicio]), end="\n")
+            for i in Arbol.direcciones_generadas():
+                Posiciones_graficar.append(i)
+                print(i + " ->\t" + str(ARBOL.Coordenadas_nodo_actual(Posiciones_graficar)), end= "\n")
+
             Arbol_generado.Graficar()
             pygame.time.delay(3000)  # Espera 3 segundos
             pygame.quit()
@@ -592,7 +602,7 @@ else:
                     for i in Direcciones_por_agregar:
                         ARBOL.Generar_nodos(i)
 
-                    # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición -------------------POSIBLE SELECCION DE PRIORIDAD
+                    # Retiramos la dirección registrada previamente y la registramos en el arbol junto con la posición
                     Ramificaciones_por_seguir.append(Direcciones_por_agregar)
 
                     # En caso de haber más de una ramificación, almacenamos las posiciones a bloquear
@@ -698,7 +708,7 @@ else:
                         else:
                             Nodos_por_agregar.clear()
                             Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
-                            # ---------------------AHORA: RESETEAR NODOS SI i == 0
+
                         # Dado las direcciones de cada ramificación, generar nodo en el arbol
                         for i in Direcciones_por_agregar:
                             ARBOL.Generar_nodos(i)
@@ -718,7 +728,7 @@ else:
                         pos_x = Posicion_Actual[1]
                         #Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))  # almacenamos al nuevo padre a graficar
                         Arbol_generado.Resetear()  # Forzamos a un reseteo debido a un cambio de ramificación
-                        # -----------------AGREGAR PADRE CON VALOR DEL ÚLTIMO NODO
+
                     # Cuando exista más de un hijo por agregar
                     else:
                         Arbol_generado.Agregar_nodo(str(Posicion_Actual))
@@ -735,7 +745,7 @@ else:
 
                         else:
                             Arbol_generado.Generar_Nodos()  # generamos los nodos al arbo, de graficación
-                            # ------------------ AHORA: VACIAR NODOS
+
                         # Dado las direcciones de cada ramificación, generar nodo en el arbol
                         # Algoritmo para eliminar e ingresar elementos en posiciones particulares con listas
                         it = Ramificaciones_por_seguir.index(Ramificaciones_por_seguir[pos])
@@ -780,35 +790,30 @@ else:
                                 if (Ramificacion in Ramificacion_bloquear) is True:
                                     Ramificaciones_bloqueadas.append(Ramificaciones_por_seguir.index(Ramificacion))
 
-                        ARBOL.Agregar_direccion(Direccion) if len(Nodos_por_agregar) != 0 else None#-----------------INVERTIR 0
+                        ARBOL.Agregar_direccion(Direccion) if len(Nodos_por_agregar) != 0 else None
                         ARBOL.Agregar_posicion(Posicion_Actual)
 
-                        # Actualizando posicion ----------------------------------QUITAR
+                        # Actualizando posicion
                         Posicion_Actual = ARBOL.Coordenadas_nodo()
                         pos_y = Posicion_Actual[0]
                         pos_x = Posicion_Actual[1]
                         if len(Nodos_por_agregar) == 0:
                             Arbol_generado.Agregar_Padre(str(Posicion_Actual))
-                            Vacio = True  # -------------- AHORA: TAMBIEN PARA CUANDO TERMINAMOS UN NIVEL DE PROFUNDIDAD
+                            Vacio = True
                             Arbol_generado.Resetear()
                         Nodos_por_agregar.clear()
                         Direcciones_por_agregar.clear()
 
             else:
-                Arbol_generado.Agregar_nodo(Arbol_generado.Valor_padre) if Vacio == True else None  # ------------ AHORA: No hace diferencia. Corregir
+                Arbol_generado.Agregar_nodo(Arbol_generado.Valor_padre) if Vacio == True else None
                 Arbol_generado.Resetear()
 
                 if len(Ramificaciones_bloqueadas) == len(Ramificaciones_por_seguir):
                     Ramificaciones_bloqueadas.clear()
                     Ramificacion_bloquear.clear()
-                    Arbol_generado.Resetear()# --------------- AHORA: Vaciar por completo los nodos de arbol_generado
+                    Arbol_generado.Resetear()
         time.sleep(0.2)
-        # ----------------------------- REVISAR LA POSICION 6,6 EN EL DEBUG
 
-
-
-        #dibujar_muneco()  # Dibujar el muñeco
-        # Arbol_generado.Agregar_Padre(str([pos_y, pos_x]))
 
         # De haber llegado a las coordenadas finales, finalizamos el programa
         if pos_x == pos_x_final and pos_y == pos_y_final:
@@ -853,6 +858,14 @@ else:
             ventana.blit(mensaje_renderizado, (ANCHO // 2 - mensaje_renderizado.get_width() // 2,ALTO // 2 - mensaje_renderizado.get_height() // 2 ))
 
             pygame.display.update()
+            #print(ARBOL.Direcciones_generadas)
+
+            Posiciones_graficar = []
+            print("NULL ->\t" + str([pos_y_inicio, pos_x_inicio]), end="\n")
+            for i in Arbol.direcciones_generadas():
+                Posiciones_graficar.append(i)
+                print(i + " ->\t" + str(ARBOL.Coordenadas_nodo_actual(Posiciones_graficar)), end= "\n")
+
             Arbol_generado.Graficar()
             pygame.time.delay(3000)  # Espera 3 segundos
             pygame.quit()

@@ -50,6 +50,9 @@ class Arbol:
     # Inicio del arbol vacio
     def __init__(self): self.Inicio = None
 
+    @classmethod
+    def direcciones_generadas(cls): return cls.Direcciones_generadas
+
     def Generar_nodos(self, Direccion):
 
         # Si esta vacio el arbol
@@ -140,12 +143,24 @@ class Arbol:
     # Insertar la posición ya recorrida
     def Agregar_posicion(self, Posicion): self.Nodos_visitados.append(Posicion)
 
-    # Obtenemos las coordenadas del nodo actual
+    # Obtenemos las coordenadas del nodo final
     def Coordenadas_nodo(self):
         aux: Nodo = self.Inicio
 
         # Llegamos a la hoja siguiendo las respectivas desiciones generadas
         for i in Arbol.Direcciones_generadas:
+            if i == 'Arriba': aux = aux.Arriba
+            if i == 'Abajo': aux = aux.Abajo
+            if i == 'Derecha': aux = aux.Derecha
+            if i == 'Izquierda': aux = aux.Izquierda
+        else: return aux.Posicion_actual
+
+    # Obtenemos las coordenadas del nodo actual
+    def Coordenadas_nodo_actual(self, Direcciones: list):
+        aux: Nodo = self.Inicio
+
+        # Llegamos a la hoja siguiendo las respectivas desiciones generadas
+        for i in Direcciones:
             if i == 'Arriba': aux = aux.Arriba
             if i == 'Abajo': aux = aux.Abajo
             if i == 'Derecha': aux = aux.Derecha
